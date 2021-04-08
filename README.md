@@ -19,4 +19,4 @@ The contracts have been developed with [Solidity 0.8.0](https://github.com/ether
 
 ### Setup Guide
 
-Follow our [SafeSnap Setup Guide](./docs/setup_guide.md) to setup a SafeBridge module.
+Follow our [Setup Guide](./docs/setup_guide.md) to setup a SafeBridge module.
