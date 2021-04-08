@@ -11,7 +11,8 @@ This module is intended to be used with the [Gnosis Safe](https://github.com/gno
 
 ### Flow
 - On chain (a), deploy a Gnosis Safe and SafeBridge Module. Enable Safe Bridge Module on the Safe.
-- On chain (b), call `requireToPassMessage()`
+- On chain (b), call `requireToPassMessage()` on the bridge contract.
+- On chain (a), call `submitSignatures()` on the bridge contract.
 
 ### Solidity Compiler
 
