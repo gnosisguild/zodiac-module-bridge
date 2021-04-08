@@ -1,4 +1,4 @@
-name: dao-module
+name: amb-module
 on: [push]
 
 jobs:
