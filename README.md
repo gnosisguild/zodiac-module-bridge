@@ -1,4 +1,4 @@
-# DAO Module
+# SafeBridge Module
 [![Build Status](https://github.com/gnosis/dao-module/workflows/amb-module/badge.svg?branch=main)](https://github.com/gnosis/amb-module/actions)
 [![Coverage Status](https://coveralls.io/repos/github/gnosis/amb-module/badge.svg?branch=main)](https://coveralls.io/github/gnosis/amb-module)
 
