@@ -183,6 +183,7 @@ describe("safeBridgeModule", async () => {
 
         it("throws if trasnaction already executed", async () => {
             const { mock, badMock, module, signers, amb, badAmb } = await setupTestWithTestExecutor();
+
             const ambTx = await module.populateTransaction.executeTransaction(user1.address, 0, "0xbaddad", 0);
 
             await mock.givenMethodReturnUint(amb.interface.getSighash("messageId"), 1);
@@ -198,8 +199,7 @@ describe("safeBridgeModule", async () => {
             const { mock, badMock, module, signers, amb, badAmb } = await setupTestWithTestExecutor();
             const ambTx = await module.populateTransaction.executeTransaction(user1.address, 10000000, "0xbaddad", 0);
 
-            await mock.givenMethodReturnUint(amb.interface.getSighash("messageId"), 1);
-
+            // should fail because value is too high
             await expect(
                 mock.exec(module.address, 0, ambTx.data)
             ).to.be.revertedWith("Module transaction failed");
@@ -207,11 +207,18 @@ describe("safeBridgeModule", async () => {
 
         it("executes a transaction", async () => {
             const { mock, badMock, module, signers, amb, badAmb } = await setupTestWithTestExecutor();
-            const ambTx = await module.populateTransaction.executeTransaction(user1.address, 0, "0xbaddad", 0);
 
-            await mock.givenMethodReturnUint(amb.interface.getSighash("messageId"), 1);
+            const moduleTx = await module.populateTransaction.setOwner(signers[1].address);
+
+            const ambTx = await module.populateTransaction.executeTransaction(module.address, 0, moduleTx.data, 0);
 
             await mock.exec(module.address, 0, ambTx.data);
+
+            expect(
+                await module.amb()
+            ).to.be.equals(
+                signers[1].address
+            );
         })
     })
 })
