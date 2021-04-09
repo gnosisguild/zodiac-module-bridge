@@ -10,9 +10,8 @@ task("setup", "deploy a SafeBridge Module")
     .setAction(async (taskArgs, hardhatRuntime) => {
         const [caller] = await hardhatRuntime.ethers.getSigners();
         console.log("Using the account:", caller.address);
-        const chainid = await hardhatRuntime.ethers.BigNumber.from(taskArgs.chainid);
         const Module = await hardhatRuntime.ethers.getContractFactory("SafeBridgeModule");
-        const module = await Module.deploy(taskArgs.dao, taskArgs.amb, taskArgs.owner, chainid);
+        const module = await Module.deploy(taskArgs.dao, taskArgs.amb, taskArgs.owner, taskArgs.chainid);
 
         console.log("SafeBridge Module deployed to:", module.address);
     });
@@ -27,7 +26,7 @@ task("verifyEtherscan", "Verifies the contract on etherscan")
         await hardhatRuntime.run("verify", {
             address: taskArgs.module,
             constructorArgsParams: [
-                taskArgs.dao, taskArgs.amb, taskArgs.owner, `${taskArgs.chainid}`
+                taskArgs.dao, taskArgs.amb, taskArgs.owner, taskArgs.chainid
             ]
         })
     });

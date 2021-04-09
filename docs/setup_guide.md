@@ -27,14 +27,14 @@ A hardhat task can be used to deploy a DAO module instance. This setup task requ
 - `chainId` (the chain ID on the other side of the AMB)
 
 An example for this on Rinkeby would be:
-`yarn hardhat --network rinkeby setup --dao <safe_address> --amb  0xD4075FB57fCf038bFc702c915Ef9592534bED5c1 --owner <xDai owner address> --chainid 100`
+`yarn hardhat --network rinkeby setup --dao <safe_address> --amb  0xD4075FB57fCf038bFc702c915Ef9592534bED5c1 --owner <xDai owner address> --chainid 0x0000000000000000000000000000000000000000000000000000000000000064`
 
 This should return the address of the deployed SafeBridge module. For this guide we assume this to be `0x4242424242424242424242424242424242424242`
 
 Once the module is deployed you should verify the source code. If you use a network that is Etherscan compatible and you configure the `ETHERSCAN_API_KEY` in your environment you can use the provided hardhat task to do this.
 
 An example for this on Rinkeby would be:
-`yarn hardhat --network rinkeby verifyEtherscan --module 0x4242424242424242424242424242424242424242 --dao <safe_address> --amb  0xD4075FB57fCf038bFc702c915Ef9592534bED5c1 --owner <xDai owner address> --chainid 100`
+`yarn hardhat --network rinkeby verifyEtherscan --module 0x4242424242424242424242424242424242424242 --dao <safe_address> --amb  0xD4075FB57fCf038bFc702c915Ef9592534bED5c1 --owner <xDai owner address> --chainid 0x0000000000000000000000000000000000000000000000000000000000000064`
 
 ### Enabling the module
 
