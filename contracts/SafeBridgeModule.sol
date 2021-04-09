@@ -21,7 +21,7 @@ interface Executor {
 interface IAMB {
     function messageSender() external view returns (address);
     function messageId() external view returns (bytes32);
-    function sourceChainId() external view returns (uint256);
+    function messageSourceChainId() external view returns (bytes32);
 }
 
 contract SafeBridgeModule {
@@ -29,7 +29,7 @@ contract SafeBridgeModule {
     IAMB public amb;
     Executor public immutable executor;
     address public owner;
-    uint256 public chainId;
+    bytes32 public chainId;
 
     // Mapping of message IDs to execution state
     mapping(bytes32 => bool) public executedBridgeTransactions;
@@ -38,7 +38,7 @@ contract SafeBridgeModule {
     /// @param _amb Address of the AMB contract
     /// @param _owner Address of the authorized owner contract on the other side of the bridge
     /// @param _chainId Address of the authorized chainId from which owner can initiate transactions
-    constructor(Executor _executor, IAMB _amb, address _owner, uint256 _chainId) {
+    constructor(Executor _executor, IAMB _amb, address _owner, bytes32 _chainId) {
         executor = _executor;
         amb = _amb;
         owner = _owner;
@@ -53,7 +53,7 @@ contract SafeBridgeModule {
     /// @dev Check that the amb, chainId, and owner are valid
     modifier onlyValid() {
         require(msg.sender == address(amb), "Unauthorized amb");
-        require(amb.sourceChainId() == chainId, "Unauthorized chainId");
+        require(amb.messageSourceChainId() == chainId, "Unauthorized chainId");
         require(amb.messageSender() == owner, "Unauthorized owner");
         require(executedBridgeTransactions[amb.messageId()] == false, "Transaction already executed");
         _;
@@ -73,7 +73,7 @@ contract SafeBridgeModule {
     /// @dev Set the approved chainId
     /// @param _chainId ID of the approved network
     /// @notice This can only be called by the executor
-    function setChainId(uint256 _chainId)
+    function setChainId(bytes32 _chainId)
         public
         executorOnly()
     {
