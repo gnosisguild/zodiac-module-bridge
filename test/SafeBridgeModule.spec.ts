@@ -160,7 +160,7 @@ describe("safeBridgeModule", async () => {
         })
 
         it("throws if chainId is unauthorized", async () => {
-            const { mock, badMock, module, signers, amb, badAmb } = await setupTestWithTestExecutor();
+            const { mock, module, signers, amb } = await setupTestWithTestExecutor();
             const ambTx = await module.populateTransaction.executeTransaction(user1.address, 0, "0xbaddad", 0);
 
             await mock.givenMethodReturnUint(amb.interface.getSighash("messageSourceChainId"), 2);
@@ -171,7 +171,7 @@ describe("safeBridgeModule", async () => {
         })
 
         it("throws if messageSender is unauthorized", async () => {
-            const { mock, badMock, module, signers, amb, badAmb } = await setupTestWithTestExecutor();
+            const { mock, module, signers, amb } = await setupTestWithTestExecutor();
             const ambTx = await module.populateTransaction.executeTransaction(user1.address, 0, "0xbaddad", 0);
 
             await mock.givenMethodReturnUint(amb.interface.getSighash("messageSender"), signers[1].address);
@@ -182,7 +182,7 @@ describe("safeBridgeModule", async () => {
         })
 
         it("throws if trasnaction already executed", async () => {
-            const { mock, badMock, module, signers, amb, badAmb } = await setupTestWithTestExecutor();
+            const { mock, module, signers, amb } = await setupTestWithTestExecutor();
 
             const ambTx = await module.populateTransaction.executeTransaction(user1.address, 0, "0xbaddad", 0);
 
@@ -196,7 +196,7 @@ describe("safeBridgeModule", async () => {
         })
 
         it("throws if module transaction fails", async () => {
-            const { mock, badMock, module, signers, amb, badAmb } = await setupTestWithTestExecutor();
+            const { mock, module, signers, amb } = await setupTestWithTestExecutor();
             const ambTx = await module.populateTransaction.executeTransaction(user1.address, 10000000, "0xbaddad", 0);
 
             // should fail because value is too high
@@ -206,7 +206,7 @@ describe("safeBridgeModule", async () => {
         })
 
         it("executes a transaction", async () => {
-            const { mock, badMock, module, signers, amb, badAmb } = await setupTestWithTestExecutor();
+            const { mock, module, signers, amb } = await setupTestWithTestExecutor();
 
             const moduleTx = await module.populateTransaction.setOwner(signers[1].address);
 
@@ -215,7 +215,7 @@ describe("safeBridgeModule", async () => {
             await mock.exec(module.address, 0, ambTx.data);
 
             expect(
-                await module.amb()
+                await module.owner()
             ).to.be.equals(
                 signers[1].address
             );
