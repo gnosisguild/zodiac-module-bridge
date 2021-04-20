@@ -2,7 +2,7 @@ import "hardhat-deploy";
 import "@nomiclabs/hardhat-ethers";
 import { task, types } from "hardhat/config";
 
-task("encodeTx", "deploy a SafeBridge Module")
+task("encodeTx", "encodes the transaction data to be used as the _data parameter of requireToPassMessage().")
     .addParam("to", "Address that the Safe should send a Tx to", undefined, types.string)
     .addParam("value", "Value of the transaction, in wei", undefined, types.string)
     .addParam("data", "Transaction data", undefined, types.string)
