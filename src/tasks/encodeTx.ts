@@ -16,4 +16,17 @@ task("encodeTx", "encodes the transaction data to be used as the _data parameter
         console.log("Encoded Transaction:", moduleTx.data);
     });
 
+task("encodeBridgeTx", "encodes the data for a requireToPassMessage() call to the AMB contract.")
+    .addParam("to", "Address of the AMB module", undefined, types.string)
+    .addParam("data", "Transaction data", undefined, types.string)
+    .addParam("gas", "Amount of gas to use for the transaction on the other side of the AMB", undefined, types.string)
+    .setAction(async (taskArgs, hardhatRuntime) => {
+        const [caller] = await hardhatRuntime.ethers.getSigners();
+        console.log("Using the account:", caller.address);
+        const amb = await hardhatRuntime.ethers.getContractAt("IAMB", "0x0000000000000000000000000000000000000000");
+        const ambTx = await amb.populateTransaction.requireToPassMessage(taskArgs.to, taskArgs.data, `${taskArgs.gas}`)
+
+        console.log("Encoded Transaction:", ambTx.data);
+    });
+
 export { };
