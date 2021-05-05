@@ -23,6 +23,7 @@ interface IAMB {
     function messageId() external view returns (bytes32);
     function messageSourceChainId() external view returns (bytes32);
     function requireToPassMessage(address _contract, bytes memory _data, uint256 _gas) external returns (bytes32);
+    function messageCallStatus(bytes32 _messageId) external view returns (bool);
 }
 
 contract SafeBridgeModule {
@@ -31,9 +32,6 @@ contract SafeBridgeModule {
     Executor public immutable executor;
     address public owner;
     bytes32 public chainId;
-
-    // Mapping of message IDs to execution state
-    mapping(bytes32 => bool) public executedBridgeTransactions;
 
     /// @param _executor Address of the executor (e.g. a Safe)
     /// @param _amb Address of the AMB contract
@@ -56,7 +54,7 @@ contract SafeBridgeModule {
         require(msg.sender == address(amb), "Unauthorized amb");
         require(amb.messageSourceChainId() == chainId, "Unauthorized chainId");
         require(amb.messageSender() == owner, "Unauthorized owner");
-        require(executedBridgeTransactions[amb.messageId()] == false, "Transaction already executed");
+        require(amb.messageCallStatus(amb.messageId()) == false, "Transaction already executed");
         _;
     }
 
@@ -103,6 +101,5 @@ contract SafeBridgeModule {
         onlyValid()
     {
         require(executor.execTransactionFromModule(to, value, data, operation), "Module transaction failed");
-        executedBridgeTransactions[amb.messageId()] = true;
     }
 }

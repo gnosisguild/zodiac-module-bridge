@@ -183,13 +183,12 @@ describe("safeBridgeModule", async () => {
 
         it("throws if trasnaction already executed", async () => {
             const { mock, module, signers, amb } = await setupTestWithTestExecutor();
-
             const ambTx = await module.populateTransaction.executeTransaction(user1.address, 0, "0xbaddad", 0);
-
             await mock.givenMethodReturnUint(amb.interface.getSighash("messageId"), 1);
+            await mock.givenMethodReturnUint(amb.interface.getSighash("messageCallStatus"), 0);
 
             await mock.exec(module.address, 0, ambTx.data);
-
+            await mock.givenMethodReturnUint(amb.interface.getSighash("messageCallStatus"), 1);
             await expect(
                 mock.exec(module.address, 0, ambTx.data)
             ).to.be.revertedWith("Transaction already executed");
