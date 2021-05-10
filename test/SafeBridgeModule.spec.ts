@@ -181,20 +181,6 @@ describe("safeBridgeModule", async () => {
             ).to.be.revertedWith("Unauthorized owner");
         })
 
-        it("throws if trasnaction already executed", async () => {
-            const { mock, module, signers, amb } = await setupTestWithTestExecutor();
-
-            const ambTx = await module.populateTransaction.executeTransaction(user1.address, 0, "0xbaddad", 0);
-
-            await mock.givenMethodReturnUint(amb.interface.getSighash("messageId"), 1);
-
-            await mock.exec(module.address, 0, ambTx.data);
-
-            await expect(
-                mock.exec(module.address, 0, ambTx.data)
-            ).to.be.revertedWith("Transaction already executed");
-        })
-
         it("throws if module transaction fails", async () => {
             const { mock, module, signers, amb } = await setupTestWithTestExecutor();
             const ambTx = await module.populateTransaction.executeTransaction(user1.address, 10000000, "0xbaddad", 0);
