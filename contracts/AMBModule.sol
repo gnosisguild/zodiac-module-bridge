@@ -25,7 +25,7 @@ interface IAMB {
     function requireToPassMessage(address _contract, bytes memory _data, uint256 _gas) external returns (bytes32);
 }
 
-contract SafeBridgeModule {
+contract AMBModule {
 
     IAMB public amb;
     Executor public immutable executor;

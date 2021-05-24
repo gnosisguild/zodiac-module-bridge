@@ -2,7 +2,7 @@ import { expect } from "chai";
 import hre, { deployments, ethers, waffle } from "hardhat";
 import "@nomiclabs/hardhat-ethers";
 
-describe("safeBridgeModule", async () => {
+describe("AMBModule", async () => {
 
     const FORTYTWO = "0x000000000000000000000000000000000000000000000000000000000000002a";
 
@@ -28,7 +28,7 @@ describe("safeBridgeModule", async () => {
 
     const setupTestWithTestExecutor = deployments.createFixture(async () => {
         const base = await baseSetup();
-        const Module = await hre.ethers.getContractFactory("SafeBridgeModule");
+        const Module = await hre.ethers.getContractFactory("AMBModule");
         const provider = await hre.ethers.getDefaultProvider();
         const network = await provider.getNetwork();
         const module = await Module.deploy(base.executor.address, base.amb.address, base.signers[0].address, base.amb.messageSourceChainId());
