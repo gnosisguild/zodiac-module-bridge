@@ -1,6 +1,6 @@
 # SafeBridge Module
-[![Build Status](https://github.com/gnosis/amb-module/workflows/amb-module/badge.svg?branch=safebridge)](https://github.com/gnosis/amb-module/actions)
-[![Coverage Status](https://coveralls.io/repos/github/gnosis/amb-module/badge.svg?branch=safebridge)](https://coveralls.io/github/gnosis/amb-module?branch=safebridge)
+[![Build Status](https://github.com/gnosis/SafeBridge/workflows/SafeBridge/badge.svg?branch=safebridge)](https://github.com/gnosis/SafeBridge/actions)
+[![Coverage Status](https://coveralls.io/repos/github/gnosis/SafeBridge/badge.svg?branch=safebridge)](https://coveralls.io/github/gnosis/SafeBridge?branch=safebridge)
 
 This module allows for execution of transactions initiated by a designated address on the other side of a designated arbitrary message bridge (AMB).
 

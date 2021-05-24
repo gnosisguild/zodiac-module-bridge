@@ -1,4 +1,4 @@
-name: amb-module
+name: SafeBridge
 on: [push]
 
 jobs:
