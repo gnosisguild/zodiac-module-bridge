@@ -26,21 +26,32 @@ interface IAMB {
 }
 
 contract AMBModule {
+    event AmbModuleSetup(address indexed initiator, address indexed safe);
 
     IAMB public amb;
-    Executor public immutable executor;
+    Executor public executor;
     address public owner;
     bytes32 public chainId;
+
+    bool isInitialized = false;
+
+    constructor() {
+        isInitialized = true;
+    }
 
     /// @param _executor Address of the executor (e.g. a Safe)
     /// @param _amb Address of the AMB contract
     /// @param _owner Address of the authorized owner contract on the other side of the bridge
     /// @param _chainId Address of the authorized chainId from which owner can initiate transactions
-    constructor(Executor _executor, IAMB _amb, address _owner, bytes32 _chainId) {
+    function setUp(Executor _executor, IAMB _amb, address _owner, bytes32 _chainId) external {
+        require(!isInitialized, "Module is already initialized");
         executor = _executor;
         amb = _amb;
         owner = _owner;
         chainId = _chainId;
+        isInitialized = true;
+
+        emit AmbModuleSetup(msg.sender, address(_executor));
     }
 
     modifier executorOnly() {

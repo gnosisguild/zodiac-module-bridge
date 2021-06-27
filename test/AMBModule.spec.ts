@@ -28,10 +28,11 @@ describe("AMBModule", async () => {
 
     const setupTestWithTestExecutor = deployments.createFixture(async () => {
         const base = await baseSetup();
-        const Module = await hre.ethers.getContractFactory("AMBModule");
+        const Module = await hre.ethers.getContractFactory("AMBModuleMock");
         const provider = await hre.ethers.getDefaultProvider();
         const network = await provider.getNetwork();
-        const module = await Module.deploy(base.executor.address, base.amb.address, base.signers[0].address, base.amb.messageSourceChainId());
+        const module = await Module.deploy();
+        await module.setUp(base.executor.address, base.amb.address, base.signers[0].address, base.amb.messageSourceChainId())
         await base.executor.setModule(module.address);
         return { ...base, Module, module, network };
     })
