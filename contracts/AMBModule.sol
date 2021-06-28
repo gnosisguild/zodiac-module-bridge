@@ -33,7 +33,7 @@ contract AMBModule {
     address public owner;
     bytes32 public chainId;
 
-    bool isInitialized = false;
+    bool public isInitialized = false;
 
     constructor() {
         isInitialized = true;
