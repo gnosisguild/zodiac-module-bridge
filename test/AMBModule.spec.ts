@@ -28,7 +28,7 @@ describe("AMBModule", async () => {
 
     const setupTestWithTestExecutor = deployments.createFixture(async () => {
         const base = await baseSetup();
-        const Module = await hre.ethers.getContractFactory("AMBModuleMock");
+        const Module = await hre.ethers.getContractFactory("AMBModule");
         const provider = await hre.ethers.getDefaultProvider();
         const network = await provider.getNetwork();
         const module = await Module.deploy();

@@ -35,10 +35,6 @@ contract AMBModule {
 
     bool public isInitialized = false;
 
-    constructor() {
-        isInitialized = true;
-    }
-
     /// @param _executor Address of the executor (e.g. a Safe)
     /// @param _amb Address of the AMB contract
     /// @param _owner Address of the authorized owner contract on the other side of the bridge
