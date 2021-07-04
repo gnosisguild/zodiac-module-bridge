@@ -3,6 +3,11 @@ import "@nomiclabs/hardhat-ethers";
 import { task, types } from "hardhat/config";
 import { Contract } from "ethers";
 
+const FIRST_ADDRESS = "0x0000000000000000000000000000000000000000";
+const ZERO_ADDRESS = "0x0000000000000000000000000000000000000001";
+const ZERO =
+  "0x0000000000000000000000000000000000000000000000000000000000000000";
+
 task("setup", "deploy a SafeBridge Module")
   .addParam("dao", "Address of the DAO (e.g. Safe)", undefined, types.string)
   .addParam("amb", "Address of the AMB", undefined, types.string)
@@ -36,7 +41,12 @@ task("setup", "deploy a SafeBridge Module")
 
 task("factory-setup", "deploy a SafeBridge Module")
   .addParam("factory", "Address of the Proxy Factory", undefined, types.string)
-  .addParam("singleton", "Address of the Delay Module Master Copy", undefined, types.string)
+  .addParam(
+    "masterCopy",
+    "Address of the AMB Module Master Copy",
+    undefined,
+    types.string
+  )
   .addParam("dao", "Address of the DAO (e.g. Safe)", undefined, types.string)
   .addParam("amb", "Address of the AMB", undefined, types.string)
   .addParam(
@@ -57,21 +67,24 @@ task("factory-setup", "deploy a SafeBridge Module")
 
     const FactoryAbi = [
       `function deployModule(
-          address singleton, 
+          address masterCopy, 
           bytes memory initializer
       ) public returns (address clone)`,
     ];
 
-    const Factory = new Contract(taskArgs.factory, FactoryAbi, caller)
+    const Factory = new Contract(taskArgs.factory, FactoryAbi, caller);
     const Module = await hardhatRuntime.ethers.getContractFactory("AMBModule");
-    const initParams = Module.interface.encodeFunctionData('setUp', [
-      taskArgs.dao, 
+    const initParams = Module.interface.encodeFunctionData("setUp", [
+      taskArgs.dao,
       taskArgs.amb,
       taskArgs.owner,
-      taskArgs.chainid
-    ])
+      taskArgs.chainid,
+    ]);
 
-    const receipt = await Factory.deployModule(taskArgs.singleton, initParams).then((tx: any) => tx.wait(3));
+    const receipt = await Factory.deployModule(
+      taskArgs.masterCopy,
+      initParams
+    ).then((tx: any) => tx.wait(3));
     console.log("Module deployed to:", receipt.logs[1].address);
   });
 
@@ -107,5 +120,27 @@ task("verifyEtherscan", "Verifies the contract on etherscan")
       ],
     });
   });
+
+task("deployMasterCopy", "deploy a master copy of AMB Module").setAction(
+  async (_, hardhatRuntime) => {
+    const [caller] = await hardhatRuntime.ethers.getSigners();
+    console.log("Using the account:", caller.address);
+    const Module = await hardhatRuntime.ethers.getContractFactory("AMBModule");
+    const module = await Module.deploy(
+      ZERO_ADDRESS,
+      ZERO_ADDRESS,
+      FIRST_ADDRESS,
+      ZERO
+    );
+
+    await module.deployTransaction.wait(3);
+
+    console.log("Module deployed to:", module.address);
+    await hardhatRuntime.run("verify:verify", {
+      address: module.address,
+      constructorArguments: [ZERO_ADDRESS, ZERO_ADDRESS, FIRST_ADDRESS, ZERO],
+    });
+  }
+);
 
 export {};

@@ -20,7 +20,7 @@ The first step is to deploy the module. Every Safe will have their own module. T
 
 
 
-Hardhat tasks can be used to deploy a DAO module instance. There are two different tasks to deploy the module, the first one is through a normal deployment and passing arguments to the constructor (with the task `setup`), or, deploy the Module through a [Minimal Proxy Factory](https://eips.ethereum.org/EIPS/eip-1167) and save on gas costs (with the task `factory-setup`) - In rinkeby the address of the Proxy Factory is: `0xE9E80739Af9D0DD8AaE6255c96a1266c059469ba` and the singleton of the Bridge Module: `0x399E5e6424DF1448dB19fccFbc9E3DCef95c9f34`.
+Hardhat tasks can be used to deploy a DAO module instance. There are two different tasks to deploy the module, the first one is through a normal deployment and passing arguments to the constructor (with the task `setup`), or, deploy the Module through a [Minimal Proxy Factory](https://eips.ethereum.org/EIPS/eip-1167) and save on gas costs (with the task `factory-setup`) - In rinkeby the address of the Proxy Factory is: `0xE9E80739Af9D0DD8AaE6255c96a1266c059469ba` and the Master Copy of the Bridge Module: `0x399E5e6424DF1448dB19fccFbc9E3DCef95c9f34`.
 
 These setup tasks requires the following parameters:
 - `dao` (the address of the Safe)
@@ -33,7 +33,7 @@ An example for this on Rinkeby would be:
 
 or
 
-`yarn hardhat --network rinkeby factory-setup --factory <factory_address> --singleton <singleton_address> --dao <safe_address> --amb  0xD4075FB57fCf038bFc702c915Ef9592534bED5c1 --owner <side_chain_owner_address> --chainid 0x0000000000000000000000000000000000000000000000000000000000000064`
+`yarn hardhat --network rinkeby factory-setup --factory <factory_address> --masterCopy <masterCopy_address> --dao <safe_address> --amb  0xD4075FB57fCf038bFc702c915Ef9592534bED5c1 --owner <side_chain_owner_address> --chainid 0x0000000000000000000000000000000000000000000000000000000000000064`
 
 This should return the address of the deployed SafeBridge module. For this guide we assume this to be `0x4242424242424242424242424242424242424242`
 
@@ -49,3 +49,7 @@ To allow the SafeBridge module to actually execute transaction it is required to
 ### Executing a transactions
 
 To execute a transaction, call the `requireToPassMessage(address _contract, bytes _data, uint256 _gas)` function on the AMB contract deployed to xDai at [`0xc38D4991c951fE8BCE1a12bEef2046eF36b0FA4A`](https://blockscout.com/poa/xdai/address/0xc38D4991c951fE8BCE1a12bEef2046eF36b0FA4A/contracts) from the `owner` address set in your AMB module.
+
+### Deploy a master copy 
+
+If the contract get an update, you can deploy a new version of a Master Copy using the hardhat task `deployMasterCopy`. An example of the command would be: `yarn hardhat --network rinkeby deployMasterCopy`
