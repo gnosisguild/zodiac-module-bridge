@@ -20,7 +20,9 @@ The first step is to deploy the module. Every Safe will have their own module. T
 
 
 
-A hardhat task can be used to deploy a DAO module instance. This setup task requires the following parameters:
+Hardhat tasks can be used to deploy a DAO module instance. There are two different tasks to deploy the module, the first one is through a normal deployment and passing arguments to the constructor (with the task `setup`), or, deploy the Module through a [Minimal Proxy Factory](https://eips.ethereum.org/EIPS/eip-1167) and save on gas costs (with the task `factory-setup`) - In rinkeby the address of the Proxy Factory is: `0xE9E80739Af9D0DD8AaE6255c96a1266c059469ba` and the singleton of the Bridge Module: `0x399E5e6424DF1448dB19fccFbc9E3DCef95c9f34`.
+
+These setup tasks requires the following parameters:
 - `dao` (the address of the Safe)
 - `amb` (the address of the AMB contract)
 - `owner` (the address of the owner on the other side of the AMB)
@@ -29,9 +31,13 @@ A hardhat task can be used to deploy a DAO module instance. This setup task requ
 An example for this on Rinkeby would be:
 `yarn hardhat --network rinkeby setup --dao <safe_address> --amb  0xD4075FB57fCf038bFc702c915Ef9592534bED5c1 --owner <xDai owner address> --chainid 0x0000000000000000000000000000000000000000000000000000000000000064`
 
+or
+
+`yarn hardhat --network rinkeby factory-setup --factory <factory_address> --singleton <singleton_address> --dao <safe_address> --amb  0xD4075FB57fCf038bFc702c915Ef9592534bED5c1 --owner <side_chain_owner_address> --chainid 0x0000000000000000000000000000000000000000000000000000000000000064`
+
 This should return the address of the deployed SafeBridge module. For this guide we assume this to be `0x4242424242424242424242424242424242424242`
 
-Once the module is deployed you should verify the source code. If you use a network that is Etherscan compatible and you configure the `ETHERSCAN_API_KEY` in your environment you can use the provided hardhat task to do this.
+Once the module is deployed you should verify the source code (Note: If you used the factory deployment the contract should be already verified). If you use a network that is Etherscan compatible and you configure the `ETHERSCAN_API_KEY` in your environment you can use the provided hardhat task to do this.
 
 An example for this on Rinkeby would be:
 `yarn hardhat --network rinkeby verifyEtherscan --module 0x4242424242424242424242424242424242424242 --dao <safe_address> --amb  0xD4075FB57fCf038bFc702c915Ef9592534bED5c1 --owner <xDai owner address> --chainid 0x0000000000000000000000000000000000000000000000000000000000000064`
