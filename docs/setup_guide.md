@@ -20,7 +20,7 @@ The first step is to deploy the module. Every Safe will have their own module. T
 
 
 
-Hardhat tasks can be used to deploy a DAO module instance. There are two different tasks to deploy the module, the first one is through a normal deployment and passing arguments to the constructor (with the task `setup`), or, deploy the Module through a [Minimal Proxy Factory](https://eips.ethereum.org/EIPS/eip-1167) and save on gas costs (with the task `factory-setup`) - In rinkeby the address of the Proxy Factory is: `0xE9E80739Af9D0DD8AaE6255c96a1266c059469ba` and the Master Copy of the Bridge Module: `0x399E5e6424DF1448dB19fccFbc9E3DCef95c9f34`.
+Hardhat tasks can be used to deploy a DAO module instance. There are two different tasks to deploy the module, the first one is through a normal deployment and passing arguments to the constructor (with the task `setup`), or, deploy the Module through a [Minimal Proxy Factory](https://eips.ethereum.org/EIPS/eip-1167) and save on gas costs (with the task `factory-setup`) - In rinkeby the address of the Proxy Factory is: `0xd067410a85ffC8C55f7245DE4BfE16C95329D232` and the Master Copy of the Bridge Module: `0x399E5e6424DF1448dB19fccFbc9E3DCef95c9f34`.
 
 These setup tasks requires the following parameters:
 - `dao` (the address of the Safe)
@@ -33,7 +33,7 @@ An example for this on Rinkeby would be:
 
 or
 
-`yarn hardhat --network rinkeby factory-setup --factory <factory_address> --masterCopy <masterCopy_address> --dao <safe_address> --amb  0xD4075FB57fCf038bFc702c915Ef9592534bED5c1 --owner <side_chain_owner_address> --chainid 0x0000000000000000000000000000000000000000000000000000000000000064`
+`yarn hardhat --network rinkeby factory-setup --factory <factory_address> --mastercopy <masterCopy_address> --dao <safe_address> --amb  0xD4075FB57fCf038bFc702c915Ef9592534bED5c1 --owner <side_chain_owner_address> --chainid 0x0000000000000000000000000000000000000000000000000000000000000064`
 
 This should return the address of the deployed SafeBridge module. For this guide we assume this to be `0x4242424242424242424242424242424242424242`
 

@@ -3,8 +3,8 @@ import "@nomiclabs/hardhat-ethers";
 import { task, types } from "hardhat/config";
 import { Contract } from "ethers";
 
-const FIRST_ADDRESS = "0x0000000000000000000000000000000000000000";
-const ZERO_ADDRESS = "0x0000000000000000000000000000000000000001";
+const FIRST_ADDRESS = "0x0000000000000000000000000000000000000001";
+const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 const ZERO =
   "0x0000000000000000000000000000000000000000000000000000000000000000";
 
@@ -42,7 +42,7 @@ task("setup", "deploy a SafeBridge Module")
 task("factory-setup", "deploy a SafeBridge Module")
   .addParam("factory", "Address of the Proxy Factory", undefined, types.string)
   .addParam(
-    "masterCopy",
+    "mastercopy",
     "Address of the AMB Module Master Copy",
     undefined,
     types.string
@@ -69,7 +69,7 @@ task("factory-setup", "deploy a SafeBridge Module")
       `function deployModule(
           address masterCopy, 
           bytes memory initializer
-      ) public returns (address clone)`,
+      ) public returns (address proxy)`,
     ];
 
     const Factory = new Contract(taskArgs.factory, FactoryAbi, caller);
@@ -82,7 +82,7 @@ task("factory-setup", "deploy a SafeBridge Module")
     ]);
 
     const receipt = await Factory.deployModule(
-      taskArgs.masterCopy,
+      taskArgs.mastercopy,
       initParams
     ).then((tx: any) => tx.wait(3));
     console.log("Module deployed to:", receipt.logs[1].address);
@@ -127,9 +127,9 @@ task("deployMasterCopy", "deploy a master copy of AMB Module").setAction(
     console.log("Using the account:", caller.address);
     const Module = await hardhatRuntime.ethers.getContractFactory("AMBModule");
     const module = await Module.deploy(
-      ZERO_ADDRESS,
-      ZERO_ADDRESS,
       FIRST_ADDRESS,
+      ZERO_ADDRESS,
+      ZERO_ADDRESS,
       ZERO
     );
 
@@ -138,7 +138,7 @@ task("deployMasterCopy", "deploy a master copy of AMB Module").setAction(
     console.log("Module deployed to:", module.address);
     await hardhatRuntime.run("verify:verify", {
       address: module.address,
-      constructorArguments: [ZERO_ADDRESS, ZERO_ADDRESS, FIRST_ADDRESS, ZERO],
+      constructorArguments: [FIRST_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS, ZERO],
     });
   }
 );
