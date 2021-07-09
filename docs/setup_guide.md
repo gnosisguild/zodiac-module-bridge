@@ -20,7 +20,7 @@ The first step is to deploy the module. Every Safe will have their own module. T
 
 
 
-Hardhat tasks can be used to deploy a DAO module instance. There are two different tasks to deploy the module, the first one is through a normal deployment and passing arguments to the constructor (with the task `setup`), or, deploy the Module through a [Minimal Proxy Factory](https://eips.ethereum.org/EIPS/eip-1167) and save on gas costs (with the task `factory-setup`) - In rinkeby the address of the Proxy Factory is: `0xd067410a85ffC8C55f7245DE4BfE16C95329D232` and the Master Copy of the Bridge Module: `0x399E5e6424DF1448dB19fccFbc9E3DCef95c9f34`.
+Hardhat tasks can be used to deploy a DAO module instance. There are two different tasks to deploy the module, the first one is through a normal deployment and passing arguments to the constructor (with the task `setup`), or, deploy the Module through a [Minimal Proxy Factory](https://eips.ethereum.org/EIPS/eip-1167) and save on gas costs (with the task `factory-setup`) - In rinkeby the address of the Proxy Factory is: `0xd067410a85ffC8C55f7245DE4BfE16C95329D232` and the Master Copy of the Bridge Module: `0x781c968c88EF6eFCBe13d174b876dc9dc0c3A99b`.
 
 These setup tasks requires the following parameters:
 - `dao` (the address of the Safe)
