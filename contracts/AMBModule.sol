@@ -41,7 +41,14 @@ contract AMBModule {
     address public owner;
     bytes32 public chainId;
 
-    bool public isInitialized = false;
+    constructor(
+        Executor _executor,
+        IAMB _amb,
+        address _owner,
+        bytes32 _chainId
+    ) {
+        setUp(_executor, _amb, _owner, _chainId);
+    }
 
     /// @param _executor Address of the executor (e.g. a Safe)
     /// @param _amb Address of the AMB contract
@@ -52,13 +59,12 @@ contract AMBModule {
         IAMB _amb,
         address _owner,
         bytes32 _chainId
-    ) external {
-        require(!isInitialized, "Module is already initialized");
+    ) public {
+        require(address(executor) == address(0), "Module is already initialized");
         executor = _executor;
         amb = _amb;
         owner = _owner;
         chainId = _chainId;
-        isInitialized = true;
 
         emit AmbModuleSetup(msg.sender, address(_executor));
     }

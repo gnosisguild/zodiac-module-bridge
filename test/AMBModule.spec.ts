@@ -1,6 +1,8 @@
 import { expect } from "chai";
-import hre, { deployments, ethers, waffle } from "hardhat";
+import hre, { deployments, waffle } from "hardhat";
 import "@nomiclabs/hardhat-ethers";
+
+const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 
 describe("AMBModule", async () => {
   const FORTYTWO =
@@ -43,7 +45,12 @@ describe("AMBModule", async () => {
     const Module = await hre.ethers.getContractFactory("AMBModule");
     const provider = await hre.ethers.getDefaultProvider();
     const network = await provider.getNetwork();
-    const module = await Module.deploy();
+    const module = await Module.deploy(
+      ZERO_ADDRESS,
+      base.amb.address,
+      base.signers[0].address,
+      base.amb.messageSourceChainId()
+    );
     await module.setUp(
       base.executor.address,
       base.amb.address,
@@ -55,6 +62,16 @@ describe("AMBModule", async () => {
   });
 
   const [user1] = waffle.provider.getWallets();
+
+  describe("setUp()", async () => {
+    it("throws if its already initialized", async () => {
+      const Module = await hre.ethers.getContractFactory("AMBModule")
+      const module = await Module.deploy(user1.address, ZERO_ADDRESS, ZERO_ADDRESS, FORTYTWO)
+      await expect(
+          module.setUp(user1.address, ZERO_ADDRESS, ZERO_ADDRESS, FORTYTWO)
+      ).to.be.revertedWith("Module is already initialized")
+    })
+  })
 
   describe("setAmb()", async () => {
     it("throws if not authorized", async () => {
