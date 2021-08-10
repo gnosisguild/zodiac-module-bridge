@@ -3,17 +3,18 @@ import "@nomiclabs/hardhat-ethers";
 import { task, types } from "hardhat/config";
 import { Contract } from "ethers";
 
-const FIRST_ADDRESS = "0x0000000000000000000000000000000000000001";
-const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-const ZERO =
+const FirstAddress = "0x0000000000000000000000000000000000000001";
+const ZeroAddress = "0x0000000000000000000000000000000000000000";
+const Zero =
   "0x0000000000000000000000000000000000000000000000000000000000000000";
 
 task("setup", "deploy a SafeBridge Module")
-  .addParam("dao", "Address of the DAO (e.g. Safe)", undefined, types.string)
+  .addParam("owner", "Address of the owner", undefined, types.string)
+  .addParam("executor", "Address of the executor", undefined, types.string)
   .addParam("amb", "Address of the AMB", undefined, types.string)
   .addParam(
-    "owner",
-    "Address of the owner on the other side of the AMB",
+    "controller",
+    "Address of the controller on the other side of the AMB",
     undefined,
     types.string
   )
@@ -26,20 +27,19 @@ task("setup", "deploy a SafeBridge Module")
   .setAction(async (taskArgs, hardhatRuntime) => {
     const [caller] = await hardhatRuntime.ethers.getSigners();
     console.log("Using the account:", caller.address);
-    const Module = await hardhatRuntime.ethers.getContractFactory(
-      "SafeBridgeModule"
-    );
+    const Module = await hardhatRuntime.ethers.getContractFactory("AMBModule");
     const module = await Module.deploy(
-      taskArgs.dao,
-      taskArgs.amb,
       taskArgs.owner,
+      taskArgs.executor,
+      taskArgs.amb,
+      taskArgs.controller,
       taskArgs.chainid
     );
 
     console.log("SafeBridge Module deployed to:", module.address);
   });
 
-task("factory-setup", "deploy a SafeBridge Module")
+task("factorySetup", "deploy a SafeBridge Module")
   .addParam("factory", "Address of the Proxy Factory", undefined, types.string)
   .addParam(
     "mastercopy",
@@ -47,11 +47,12 @@ task("factory-setup", "deploy a SafeBridge Module")
     undefined,
     types.string
   )
-  .addParam("dao", "Address of the DAO (e.g. Safe)", undefined, types.string)
+  .addParam("owner", "Address of the owner", undefined, types.string)
+  .addParam("executor", "Address of the executor", undefined, types.string)
   .addParam("amb", "Address of the AMB", undefined, types.string)
   .addParam(
-    "owner",
-    "Address of the owner on the other side of the AMB",
+    "controller",
+    "Address of the controller on the other side of the AMB",
     undefined,
     types.string
   )
@@ -75,9 +76,10 @@ task("factory-setup", "deploy a SafeBridge Module")
     const Factory = new Contract(taskArgs.factory, FactoryAbi, caller);
     const Module = await hardhatRuntime.ethers.getContractFactory("AMBModule");
     const initParams = Module.interface.encodeFunctionData("setUp", [
-      taskArgs.dao,
-      taskArgs.amb,
       taskArgs.owner,
+      taskArgs.executor,
+      taskArgs.amb,
+      taskArgs.controller,
       taskArgs.chainid,
     ]);
 
@@ -95,11 +97,17 @@ task("verifyEtherscan", "Verifies the contract on etherscan")
     undefined,
     types.string
   )
-  .addParam("dao", "Address of the DAO (e.g. Safe)", undefined, types.string)
+  .addParam("owner", "Address of the owner", undefined, types.string)
+  .addParam(
+    "executor",
+    "Address of the executor (e.g. Safe)",
+    undefined,
+    types.string
+  )
   .addParam("amb", "Address of the AMB", undefined, types.string)
   .addParam(
-    "owner",
-    "Address of the ofwner on the other side of the AMB",
+    "controller",
+    "Address of the controller on the other side of the AMB",
     undefined,
     types.string
   )
@@ -113,9 +121,10 @@ task("verifyEtherscan", "Verifies the contract on etherscan")
     await hardhatRuntime.run("verify", {
       address: taskArgs.module,
       constructorArgsParams: [
-        taskArgs.dao,
-        taskArgs.amb,
         taskArgs.owner,
+        taskArgs.executor,
+        taskArgs.amb,
+        taskArgs.controller,
         taskArgs.chainid,
       ],
     });
@@ -127,10 +136,11 @@ task("deployMasterCopy", "deploy a master copy of AMB Module").setAction(
     console.log("Using the account:", caller.address);
     const Module = await hardhatRuntime.ethers.getContractFactory("AMBModule");
     const module = await Module.deploy(
-      FIRST_ADDRESS,
-      ZERO_ADDRESS,
-      ZERO_ADDRESS,
-      ZERO
+      FirstAddress,
+      FirstAddress,
+      ZeroAddress,
+      ZeroAddress,
+      Zero
     );
 
     await module.deployTransaction.wait(3);
@@ -138,7 +148,13 @@ task("deployMasterCopy", "deploy a master copy of AMB Module").setAction(
     console.log("Module deployed to:", module.address);
     await hardhatRuntime.run("verify:verify", {
       address: module.address,
-      constructorArguments: [FIRST_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS, ZERO],
+      constructorArguments: [
+        FirstAddress,
+        FirstAddress,
+        ZeroAddress,
+        ZeroAddress,
+        Zero,
+      ],
     });
   }
 );
