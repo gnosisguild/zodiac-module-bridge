@@ -1,5 +1,5 @@
 {
-  "name": "@gnosis/safe-bridge",
+  "name": "@zodiac/amb",
   "version": "1.0.0",
   "description": "An Arbitrary Message Bridge (AMB) module for the Gnosis Safe",
   "directories": {

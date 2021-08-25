@@ -24,6 +24,11 @@ contract AMBModule is Module {
     address public controller;
     bytes32 public chainId;
 
+    /// @param _owner Address of the  owner
+    /// @param _executor Address of the executor (e.g. a Safe)
+    /// @param _amb Address of the AMB contract
+    /// @param _controller Address of the authorized controller contract on the other side of the bridge
+    /// @param _chainId Address of the authorized chainId from which owner can initiate transactions
     constructor(
         address _owner,
         address _executor,
@@ -31,21 +36,24 @@ contract AMBModule is Module {
         address _controller,
         bytes32 _chainId
     ) {
-        setUp(_owner, _executor, _amb, _controller, _chainId);
+        bytes memory initParams = abi.encode(
+            _owner,
+            _executor,
+            _amb,
+            _controller,
+            _chainId
+        );
+        setUp(initParams);
     }
 
-    /// @param _owner Address of the  owner
-    /// @param _executor Address of the executor (e.g. a Safe)
-    /// @param _amb Address of the AMB contract
-    /// @param _controller Address of the authorized controller contract on the other side of the bridge
-    /// @param _chainId Address of the authorized chainId from which owner can initiate transactions
-    function setUp(
-        address _owner,
-        address _executor,
-        IAMB _amb,
-        address _controller,
-        bytes32 _chainId
-    ) public {
+    function setUp(bytes memory initParams) public override {
+        (
+            address _owner,
+            address _executor,
+            IAMB _amb,
+            address _controller,
+            bytes32 _chainId
+        ) = abi.decode(initParams, (address, address, IAMB, address, bytes32));
         require(
             address(executor) == address(0),
             "Module is already initialized"
