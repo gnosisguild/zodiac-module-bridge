@@ -1,6 +1,6 @@
-# SafeBridge Setup Guide
+# AMB Setup Guide
 
-This guide shows how to setup the SafeBridge module with a Gnosis Safe on the Rinkeby testnetwork and an owner address on the xDai network.
+This guide shows how to setup the AMB (Arbitrary Message Bridge) module with a Gnosis Safe on the Rinkeby testnetwork and an owner address on the xDai network.
 
 ## Prerequisites
 
@@ -20,7 +20,7 @@ The first step is to deploy the module. Every Safe will have their own module. T
 
 
 
-Hardhat tasks can be used to deploy a DAO module instance. There are two different tasks to deploy the module, the first one is through a normal deployment and passing arguments to the constructor (with the task `setup`), or, deploy the Module through a [Minimal Proxy Factory](https://eips.ethereum.org/EIPS/eip-1167) and save on gas costs (with the task `factorySetup`) - In rinkeby the address of the Proxy Factory is: `0xd067410a85ffC8C55f7245DE4BfE16C95329D232` and the Master Copy of the Bridge Module: `0x7e930cd04347E64e231427D429F18177759B63be`.
+Hardhat tasks can be used to deploy an AMB instance. There are two different tasks to deploy the module, the first one is through a normal deployment and passing arguments to the constructor (with the task `setup`), or, deploy the Module through a [Minimal Proxy Factory](https://eips.ethereum.org/EIPS/eip-1167) and save on gas costs (with the task `factorySetup`) - In rinkeby the address of the Proxy Factory is: `0xd067410a85ffC8C55f7245DE4BfE16C95329D232` and the Master Copy of the Bridge Module: `0xf04e9c4aE09fCBb6DF20F0717B08eE298761C770`.
 
 These setup tasks requires the following parameters:
 - `owner` (the address of the owner)

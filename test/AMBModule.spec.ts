@@ -1,10 +1,10 @@
 import { expect } from "chai";
-import hre, { deployments, waffle, ethers } from "hardhat";
+import hre, { deployments, waffle } from "hardhat";
 import "@nomiclabs/hardhat-ethers";
+import { AbiCoder } from "ethers/lib/utils";
 
 const ZeroAddress = "0x0000000000000000000000000000000000000000";
 const FortyTwo = "0x000000000000000000000000000000000000000000000000000000000000002a";
-const encoder = new ethers.utils.AbiCoder();
 
 describe("AMBModule", async () => {
   let initializeParams: string;
@@ -38,7 +38,7 @@ describe("AMBModule", async () => {
       signers[1].address
     );
 
-    initializeParams = encoder.encode(
+    initializeParams = new AbiCoder().encode(
       ["address", "address", "address", "address", "bytes32"],
       [
         executor.address,

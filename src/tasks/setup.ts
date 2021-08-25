@@ -2,6 +2,7 @@ import "hardhat-deploy";
 import "@nomiclabs/hardhat-ethers";
 import { task, types } from "hardhat/config";
 import { Contract } from "ethers";
+import { AbiCoder } from "ethers/lib/utils";
 
 const FirstAddress = "0x0000000000000000000000000000000000000001";
 const ZeroAddress = "0x0000000000000000000000000000000000000000";
@@ -75,12 +76,18 @@ task("factorySetup", "deploy a SafeBridge Module")
 
     const Factory = new Contract(taskArgs.factory, FactoryAbi, caller);
     const Module = await hardhatRuntime.ethers.getContractFactory("AMBModule");
+    const encodedParams = new AbiCoder().encode(
+      ["address", "address", "address", "address", "bytes32"],
+      [
+        taskArgs.owner,
+        taskArgs.executor,
+        taskArgs.amb,
+        taskArgs.controller,
+        taskArgs.chainid,
+      ]
+    );
     const initParams = Module.interface.encodeFunctionData("setUp", [
-      taskArgs.owner,
-      taskArgs.executor,
-      taskArgs.amb,
-      taskArgs.controller,
-      taskArgs.chainid,
+      encodedParams,
     ]);
 
     const receipt = await Factory.deployModule(
