@@ -4,7 +4,8 @@ import "@nomiclabs/hardhat-ethers";
 import { AbiCoder } from "ethers/lib/utils";
 
 const ZeroAddress = "0x0000000000000000000000000000000000000000";
-const FortyTwo = "0x000000000000000000000000000000000000000000000000000000000000002a";
+const FortyTwo =
+  "0x000000000000000000000000000000000000000000000000000000000000002a";
 
 describe("AMBModule", async () => {
   let initializeParams: string;
@@ -58,14 +59,12 @@ describe("AMBModule", async () => {
     const provider = await hre.ethers.getDefaultProvider();
     const network = await provider.getNetwork();
     const module = await Module.deploy(
-      ZeroAddress,
-      ZeroAddress,
+      base.executor.address,
+      base.executor.address,
       base.amb.address,
       base.signers[0].address,
       base.amb.messageSourceChainId()
     );
-
-    await module.setUp(initializeParams);
     await base.executor.setModule(module.address);
     return { ...base, Module, module, network };
   });
@@ -81,10 +80,23 @@ describe("AMBModule", async () => {
         user1.address,
         ZeroAddress,
         ZeroAddress,
-        FortyTwo );
+        FortyTwo
+      );
       await expect(module.setUp(initializeParams)).to.be.revertedWith(
         "Module is already initialized"
       );
+    });
+    it("throws if executor is address zero", async () => {
+      const { Module } = await setupTestWithTestExecutor();
+      await expect(
+        Module.deploy(
+          ZeroAddress,
+          ZeroAddress,
+          ZeroAddress,
+          ZeroAddress,
+          FortyTwo
+        )
+      ).to.be.revertedWith("Executor can not be zero address");
     });
   });
 
@@ -126,7 +138,8 @@ describe("AMBModule", async () => {
   describe("setChainId()", async () => {
     it("throws if not authorized", async () => {
       const { module } = await setupTestWithTestExecutor();
-      await expect(module.setChainId(FortyTwo)).to.be.revertedWith( "Ownable: caller is not the owner"
+      await expect(module.setChainId(FortyTwo)).to.be.revertedWith(
+        "Ownable: caller is not the owner"
       );
     });
 
@@ -145,7 +158,7 @@ describe("AMBModule", async () => {
     it("updates chainId", async () => {
       const { module, executor, network } = await setupTestWithTestExecutor();
       let currentChainID = await module.chainId();
-      const newChainID = FortyTwo 
+      const newChainID = FortyTwo;
       expect(await currentChainID._hex).to.not.equals(newChainID);
 
       const calldata = module.interface.encodeFunctionData("setChainId", [

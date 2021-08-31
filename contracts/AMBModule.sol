@@ -55,18 +55,17 @@ contract AMBModule is Module {
             bytes32 _chainId
         ) = abi.decode(initParams, (address, address, IAMB, address, bytes32));
         require(!initialized, "Module is already initialized");
-        executor = _executor;
+        initialized = true;
+        require(_executor != address(0), "Executor can not be zero address");
+        avatar = _executor;
         amb = _amb;
         controller = _controller;
         chainId = _chainId;
 
-        if (_executor != address(0)) {
-            __Ownable_init();
-            transferOwnership(_owner);
-            initialized = true;
-        }
+        __Ownable_init();
+        transferOwnership(_owner);
 
-        emit AmbModuleSetup(msg.sender, address(_executor));
+        emit AmbModuleSetup(msg.sender, _executor);
     }
 
     /// @dev Check that the amb, chainId, and owner are valid
