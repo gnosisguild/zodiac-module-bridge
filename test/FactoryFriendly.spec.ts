@@ -65,7 +65,6 @@ describe("Module works with factory", () => {
       .then((tx: any) => tx.wait());
 
     // retrieve new address from event
-    console.log(receipt.events)
     const {
       args: [newProxyAddress],
     } = receipt.events.find(
