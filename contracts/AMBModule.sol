@@ -24,6 +24,11 @@ contract AMBModule is Module {
     address public controller;
     bytes32 public chainId;
 
+    /// @param _owner Address of the  owner
+    /// @param _executor Address of the executor (e.g. a Safe)
+    /// @param _amb Address of the AMB contract
+    /// @param _controller Address of the authorized controller contract on the other side of the bridge
+    /// @param _chainId Address of the authorized chainId from which owner can initiate transactions
     constructor(
         address _owner,
         address _executor,
@@ -31,36 +36,36 @@ contract AMBModule is Module {
         address _controller,
         bytes32 _chainId
     ) {
-        setUp(_owner, _executor, _amb, _controller, _chainId);
+        bytes memory initParams = abi.encode(
+            _owner,
+            _executor,
+            _amb,
+            _controller,
+            _chainId
+        );
+        setUp(initParams);
     }
 
-    /// @param _owner Address of the  owner
-    /// @param _executor Address of the executor (e.g. a Safe)
-    /// @param _amb Address of the AMB contract
-    /// @param _controller Address of the authorized controller contract on the other side of the bridge
-    /// @param _chainId Address of the authorized chainId from which owner can initiate transactions
-    function setUp(
-        address _owner,
-        address _executor,
-        IAMB _amb,
-        address _controller,
-        bytes32 _chainId
-    ) public {
-        require(
-            address(executor) == address(0),
-            "Module is already initialized"
-        );
-        executor = _executor;
+    function setUp(bytes memory initParams) public override {
+        (
+            address _owner,
+            address _executor,
+            IAMB _amb,
+            address _controller,
+            bytes32 _chainId
+        ) = abi.decode(initParams, (address, address, IAMB, address, bytes32));
+        require(!initialized, "Module is already initialized");
+        initialized = true;
+        require(_executor != address(0), "Executor can not be zero address");
+        avatar = _executor;
         amb = _amb;
         controller = _controller;
         chainId = _chainId;
 
-        if (_executor != address(0)) {
-            __Ownable_init();
-            transferOwnership(_owner);
-        }
+        __Ownable_init();
+        transferOwnership(_owner);
 
-        emit AmbModuleSetup(msg.sender, address(_executor));
+        emit AmbModuleSetup(msg.sender, _executor);
     }
 
     /// @dev Check that the amb, chainId, and owner are valid

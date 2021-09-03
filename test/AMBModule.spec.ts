@@ -1,12 +1,14 @@
 import { expect } from "chai";
 import hre, { deployments, waffle } from "hardhat";
 import "@nomiclabs/hardhat-ethers";
+import { AbiCoder } from "ethers/lib/utils";
 
-const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
+const ZeroAddress = "0x0000000000000000000000000000000000000000";
+const FortyTwo =
+  "0x000000000000000000000000000000000000000000000000000000000000002a";
 
 describe("AMBModule", async () => {
-  const FORTYTWO =
-    "0x000000000000000000000000000000000000000000000000000000000000002a";
+  let initializeParams: string;
 
   const baseSetup = deployments.createFixture(async () => {
     await deployments.fixture();
@@ -37,6 +39,17 @@ describe("AMBModule", async () => {
       signers[1].address
     );
 
+    initializeParams = new AbiCoder().encode(
+      ["address", "address", "address", "address", "bytes32"],
+      [
+        executor.address,
+        executor.address,
+        amb.address,
+        signers[0].address,
+        await amb.messageSourceChainId(),
+      ]
+    );
+
     return { Executor, executor, module, mock, badMock, amb, badAmb, signers };
   });
 
@@ -46,13 +59,6 @@ describe("AMBModule", async () => {
     const provider = await hre.ethers.getDefaultProvider();
     const network = await provider.getNetwork();
     const module = await Module.deploy(
-      ZERO_ADDRESS,
-      ZERO_ADDRESS,
-      base.amb.address,
-      base.signers[0].address,
-      base.amb.messageSourceChainId()
-    );
-    await module.setUp(
       base.executor.address,
       base.executor.address,
       base.amb.address,
@@ -67,13 +73,32 @@ describe("AMBModule", async () => {
 
   describe("setUp()", async () => {
     it("throws if its already initialized", async () => {
-      const Module = await hre.ethers.getContractFactory("AMBModule")
-      const module = await Module.deploy(user1.address, user1.address, ZERO_ADDRESS, ZERO_ADDRESS, FORTYTWO)
+      await baseSetup();
+      const Module = await hre.ethers.getContractFactory("AMBModule");
+      const module = await Module.deploy(
+        user1.address,
+        user1.address,
+        ZeroAddress,
+        ZeroAddress,
+        FortyTwo
+      );
+      await expect(module.setUp(initializeParams)).to.be.revertedWith(
+        "Module is already initialized"
+      );
+    });
+    it("throws if executor is address zero", async () => {
+      const { Module } = await setupTestWithTestExecutor();
       await expect(
-          module.setUp(user1.address, user1.address, ZERO_ADDRESS, ZERO_ADDRESS, FORTYTWO)
-      ).to.be.revertedWith("Module is already initialized")
-    })
-  })
+        Module.deploy(
+          ZeroAddress,
+          ZeroAddress,
+          ZeroAddress,
+          ZeroAddress,
+          FortyTwo
+        )
+      ).to.be.revertedWith("Executor can not be zero address");
+    });
+  });
 
   describe("setAmb()", async () => {
     it("throws if not authorized", async () => {
@@ -113,7 +138,7 @@ describe("AMBModule", async () => {
   describe("setChainId()", async () => {
     it("throws if not authorized", async () => {
       const { module } = await setupTestWithTestExecutor();
-      await expect(module.setChainId(FORTYTWO)).to.be.revertedWith(
+      await expect(module.setChainId(FortyTwo)).to.be.revertedWith(
         "Ownable: caller is not the owner"
       );
     });
@@ -133,8 +158,7 @@ describe("AMBModule", async () => {
     it("updates chainId", async () => {
       const { module, executor, network } = await setupTestWithTestExecutor();
       let currentChainID = await module.chainId();
-      const newChainID = FORTYTWO;
-
+      const newChainID = FortyTwo;
       expect(await currentChainID._hex).to.not.equals(newChainID);
 
       const calldata = module.interface.encodeFunctionData("setChainId", [
@@ -151,9 +175,9 @@ describe("AMBModule", async () => {
   describe("setController()", async () => {
     it("throws if not authorized", async () => {
       const { module, signers } = await setupTestWithTestExecutor();
-      await expect(module.connect(signers[3]).setController(user1.address)).to.be.revertedWith(
-        "Ownable: caller is not the owner"
-      );
+      await expect(
+        module.connect(signers[3]).setController(user1.address)
+      ).to.be.revertedWith("Ownable: caller is not the owner");
     });
 
     it("throws if already set to input address", async () => {
