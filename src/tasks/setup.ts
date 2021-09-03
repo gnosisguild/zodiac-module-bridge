@@ -11,7 +11,7 @@ const Zero =
 
 task("setup", "deploy a SafeBridge Module")
   .addParam("owner", "Address of the owner", undefined, types.string)
-  .addParam("executor", "Address of the executor", undefined, types.string)
+  .addParam("avatar", "Address of the avatar", undefined, types.string)
   .addParam("amb", "Address of the AMB", undefined, types.string)
   .addParam(
     "controller",
@@ -31,7 +31,7 @@ task("setup", "deploy a SafeBridge Module")
     const Module = await hardhatRuntime.ethers.getContractFactory("AMBModule");
     const module = await Module.deploy(
       taskArgs.owner,
-      taskArgs.executor,
+      taskArgs.avatar,
       taskArgs.amb,
       taskArgs.controller,
       taskArgs.chainid
@@ -49,7 +49,7 @@ task("factorySetup", "deploy a SafeBridge Module")
     types.string
   )
   .addParam("owner", "Address of the owner", undefined, types.string)
-  .addParam("executor", "Address of the executor", undefined, types.string)
+  .addParam("avatar", "Address of the avatar", undefined, types.string)
   .addParam("amb", "Address of the AMB", undefined, types.string)
   .addParam(
     "controller",
@@ -80,7 +80,7 @@ task("factorySetup", "deploy a SafeBridge Module")
       ["address", "address", "address", "address", "bytes32"],
       [
         taskArgs.owner,
-        taskArgs.executor,
+        taskArgs.avatar,
         taskArgs.amb,
         taskArgs.controller,
         taskArgs.chainid,
@@ -106,8 +106,8 @@ task("verifyEtherscan", "Verifies the contract on etherscan")
   )
   .addParam("owner", "Address of the owner", undefined, types.string)
   .addParam(
-    "executor",
-    "Address of the executor (e.g. Safe)",
+    "avatar",
+    "Address of the avatar (e.g. Safe)",
     undefined,
     types.string
   )
@@ -129,7 +129,7 @@ task("verifyEtherscan", "Verifies the contract on etherscan")
       address: taskArgs.module,
       constructorArgsParams: [
         taskArgs.owner,
-        taskArgs.executor,
+        taskArgs.avatar,
         taskArgs.amb,
         taskArgs.controller,
         taskArgs.chainid,

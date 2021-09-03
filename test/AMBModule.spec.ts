@@ -12,8 +12,8 @@ describe("AMBModule", async () => {
 
   const baseSetup = deployments.createFixture(async () => {
     await deployments.fixture();
-    const Executor = await hre.ethers.getContractFactory("TestExecutor");
-    const executor = await Executor.deploy();
+    const Avatar = await hre.ethers.getContractFactory("TestAvatar");
+    const avatar = await Avatar.deploy();
     const Mock = await hre.ethers.getContractFactory("Mock");
     const mock = await Mock.deploy();
     const amb = await hre.ethers.getContractAt("IAMB", mock.address);
@@ -42,30 +42,30 @@ describe("AMBModule", async () => {
     initializeParams = new AbiCoder().encode(
       ["address", "address", "address", "address", "bytes32"],
       [
-        executor.address,
-        executor.address,
+        avatar.address,
+        avatar.address,
         amb.address,
         signers[0].address,
         await amb.messageSourceChainId(),
       ]
     );
 
-    return { Executor, executor, module, mock, badMock, amb, badAmb, signers };
+    return { Avatar, avatar, module, mock, badMock, amb, badAmb, signers };
   });
 
-  const setupTestWithTestExecutor = deployments.createFixture(async () => {
+  const setupTestWithTestAvatar = deployments.createFixture(async () => {
     const base = await baseSetup();
     const Module = await hre.ethers.getContractFactory("AMBModule");
     const provider = await hre.ethers.getDefaultProvider();
     const network = await provider.getNetwork();
     const module = await Module.deploy(
-      base.executor.address,
-      base.executor.address,
+      base.avatar.address,
+      base.avatar.address,
       base.amb.address,
       base.signers[0].address,
       base.amb.messageSourceChainId()
     );
-    await base.executor.setModule(module.address);
+    await base.avatar.setModule(module.address);
     return { ...base, Module, module, network };
   });
 
@@ -73,7 +73,7 @@ describe("AMBModule", async () => {
 
   describe("setUp()", async () => {
     it("throws if executor is address zero", async () => {
-      const { Module } = await setupTestWithTestExecutor();
+      const { Module } = await setupTestWithTestAvatar();
       await expect(
         Module.deploy(
           ZeroAddress,
@@ -82,7 +82,7 @@ describe("AMBModule", async () => {
           ZeroAddress,
           FortyTwo
         )
-      ).to.be.revertedWith("Executor can not be zero address");
+      ).to.be.revertedWith("Avatar can not be zero address");
     });
 
     it("should emit event because of successful set up", async () => {
@@ -103,34 +103,34 @@ describe("AMBModule", async () => {
 
   describe("setAmb()", async () => {
     it("throws if not authorized", async () => {
-      const { module } = await setupTestWithTestExecutor();
+      const { module } = await setupTestWithTestAvatar();
       await expect(module.setAmb(module.address)).to.be.revertedWith(
         "Ownable: caller is not the owner"
       );
     });
 
     it("throws if already set to input address", async () => {
-      const { module, executor, amb } = await setupTestWithTestExecutor();
+      const { module, avatar, amb } = await setupTestWithTestAvatar();
 
       expect(await module.amb()).to.be.equals(amb.address);
 
       const calldata = module.interface.encodeFunctionData("setAmb", [
         amb.address,
       ]);
-      await expect(
-        executor.exec(module.address, 0, calldata)
-      ).to.be.revertedWith("AMB address already set to this");
+      await expect(avatar.exec(module.address, 0, calldata)).to.be.revertedWith(
+        "AMB address already set to this"
+      );
     });
 
     it("updates AMB address", async () => {
-      const { module, executor, amb } = await setupTestWithTestExecutor();
+      const { module, avatar, amb } = await setupTestWithTestAvatar();
 
       expect(await module.amb()).to.be.equals(amb.address);
 
       const calldata = module.interface.encodeFunctionData("setAmb", [
         user1.address,
       ]);
-      executor.exec(module.address, 0, calldata);
+      avatar.exec(module.address, 0, calldata);
 
       expect(await module.amb()).to.be.equals(user1.address);
     });
@@ -138,26 +138,26 @@ describe("AMBModule", async () => {
 
   describe("setChainId()", async () => {
     it("throws if not authorized", async () => {
-      const { module } = await setupTestWithTestExecutor();
+      const { module } = await setupTestWithTestAvatar();
       await expect(module.setChainId(FortyTwo)).to.be.revertedWith(
         "Ownable: caller is not the owner"
       );
     });
 
     it("throws if already set to input address", async () => {
-      const { module, executor, network } = await setupTestWithTestExecutor();
+      const { module, avatar, network } = await setupTestWithTestAvatar();
       const currentChainID = await module.chainId();
 
       const calldata = module.interface.encodeFunctionData("setChainId", [
         currentChainID,
       ]);
-      await expect(
-        executor.exec(module.address, 0, calldata)
-      ).to.be.revertedWith("chainId already set to this");
+      await expect(avatar.exec(module.address, 0, calldata)).to.be.revertedWith(
+        "chainId already set to this"
+      );
     });
 
     it("updates chainId", async () => {
-      const { module, executor, network } = await setupTestWithTestExecutor();
+      const { module, avatar, network } = await setupTestWithTestAvatar();
       let currentChainID = await module.chainId();
       const newChainID = FortyTwo;
       expect(await currentChainID._hex).to.not.equals(newChainID);
@@ -165,7 +165,7 @@ describe("AMBModule", async () => {
       const calldata = module.interface.encodeFunctionData("setChainId", [
         newChainID,
       ]);
-      executor.exec(module.address, 0, calldata);
+      avatar.exec(module.address, 0, calldata);
 
       currentChainID = await module.chainId();
 
@@ -175,26 +175,26 @@ describe("AMBModule", async () => {
 
   describe("setController()", async () => {
     it("throws if not authorized", async () => {
-      const { module, signers } = await setupTestWithTestExecutor();
+      const { module, signers } = await setupTestWithTestAvatar();
       await expect(
         module.connect(signers[3]).setController(user1.address)
       ).to.be.revertedWith("Ownable: caller is not the owner");
     });
 
     it("throws if already set to input address", async () => {
-      const { module, executor } = await setupTestWithTestExecutor();
+      const { module, avatar } = await setupTestWithTestAvatar();
       const currentController = await module.controller();
 
       const calldata = module.interface.encodeFunctionData("setController", [
         currentController,
       ]);
-      await expect(
-        executor.exec(module.address, 0, calldata)
-      ).to.be.revertedWith("controller already set to this");
+      await expect(avatar.exec(module.address, 0, calldata)).to.be.revertedWith(
+        "controller already set to this"
+      );
     });
 
     it("updates controller", async () => {
-      const { module, executor, signers } = await setupTestWithTestExecutor();
+      const { module, avatar, signers } = await setupTestWithTestAvatar();
       let currentController = await module.owner();
       let newController = signers[1].address;
 
@@ -203,7 +203,7 @@ describe("AMBModule", async () => {
       const calldata = module.interface.encodeFunctionData("setController", [
         newController,
       ]);
-      executor.exec(module.address, 0, calldata);
+      avatar.exec(module.address, 0, calldata);
 
       currentController = await module.controller();
       expect(await module.controller()).to.be.equals(newController);
@@ -212,7 +212,7 @@ describe("AMBModule", async () => {
 
   describe("executeTrasnaction()", async () => {
     it("throws if amb is unauthorized", async () => {
-      const { module } = await setupTestWithTestExecutor();
+      const { module } = await setupTestWithTestAvatar();
       const tx = {
         to: user1.address,
         value: 0,
@@ -225,7 +225,7 @@ describe("AMBModule", async () => {
     });
 
     it("throws if chainId is unauthorized", async () => {
-      const { mock, module, amb } = await setupTestWithTestExecutor();
+      const { mock, module, amb } = await setupTestWithTestAvatar();
       const ambTx = await module.populateTransaction.executeTransaction(
         user1.address,
         0,
@@ -244,7 +244,7 @@ describe("AMBModule", async () => {
     });
 
     it("throws if messageSender is unauthorized", async () => {
-      const { mock, module, signers, amb } = await setupTestWithTestExecutor();
+      const { mock, module, signers, amb } = await setupTestWithTestAvatar();
       const ambTx = await module.populateTransaction.executeTransaction(
         user1.address,
         0,
@@ -263,7 +263,7 @@ describe("AMBModule", async () => {
     });
 
     it("throws if module transaction fails", async () => {
-      const { mock, module } = await setupTestWithTestExecutor();
+      const { mock, module } = await setupTestWithTestAvatar();
       const ambTx = await module.populateTransaction.executeTransaction(
         user1.address,
         10000000,
@@ -278,7 +278,7 @@ describe("AMBModule", async () => {
     });
 
     it("executes a transaction", async () => {
-      const { mock, module, signers } = await setupTestWithTestExecutor();
+      const { mock, module, signers } = await setupTestWithTestAvatar();
 
       const moduleTx = await module.populateTransaction.setController(
         signers[1].address

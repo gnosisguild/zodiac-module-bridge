@@ -14,7 +14,7 @@ DISCLAIMER: Check the deployed AMB contracts before using them.
 
 ## Setting up the module
 
-The first step is to deploy the module. Every Safe will have their own module. The module is linked to a Safe (called executor in the contract) and an AMB contract. The Safe cannot be changed after deployment.
+The first step is to deploy the module. Every Safe will have their own module. The module is linked to a Safe (called avatar in the contract) and an AMB contract. The Safe cannot be changed after deployment.
 
 ### Deploying the module
 
@@ -24,24 +24,24 @@ Hardhat tasks can be used to deploy an AMB instance. There are two different tas
 
 These setup tasks requires the following parameters:
 - `owner` (the address of the owner)
-- `executor` (the address of the executor)
+- `avatar` (the address of the avatar)
 - `amb` (the address of the AMB contract)
 - `controller` (the address of the controller on the other side of the AMB)
 - `chainId` (the chain ID on the other side of the AMB)
 
 An example for this on Rinkeby would be:
-`yarn hardhat --network rinkeby setup --owner <owner_address> --executor <executor_address> --amb  0xD4075FB57fCf038bFc702c915Ef9592534bED5c1 --controller <xDai controller address> --chainid 0x0000000000000000000000000000000000000000000000000000000000000064`
+`yarn hardhat --network rinkeby setup --owner <owner_address> --avatar <avatar_address> --amb  0xD4075FB57fCf038bFc702c915Ef9592534bED5c1 --controller <xDai controller address> --chainid 0x0000000000000000000000000000000000000000000000000000000000000064`
 
 or
 
-`yarn hardhat --network rinkeby factory-setup --factory <factory_address> --mastercopy <masterCopy_address> --owner <owner_address> --executor <executor_address> --amb  0xD4075FB57fCf038bFc702c915Ef9592534bED5c1 --controller <side_chain_controller_address> --chainid 0x0000000000000000000000000000000000000000000000000000000000000064`
+`yarn hardhat --network rinkeby factory-setup --factory <factory_address> --mastercopy <masterCopy_address> --owner <owner_address> --avatar <avatar_address> --amb  0xD4075FB57fCf038bFc702c915Ef9592534bED5c1 --controller <side_chain_controller_address> --chainid 0x0000000000000000000000000000000000000000000000000000000000000064`
 
 This should return the address of the deployed SafeBridge module. For this guide we assume this to be `0x4242424242424242424242424242424242424242`
 
 Once the module is deployed you should verify the source code (Note: If you used the factory deployment the contract should be already verified). If you use a network that is Etherscan compatible and you configure the `ETHERSCAN_API_KEY` in your environment you can use the provided hardhat task to do this.
 
 An example for this on Rinkeby would be:
-`yarn hardhat --network rinkeby verifyEtherscan --module 0x4242424242424242424242424242424242424242 --owner <owner_address> --executor <executor_address> --amb  0xD4075FB57fCf038bFc702c915Ef9592534bED5c1 --controller <xDai controller address> --chainid 0x0000000000000000000000000000000000000000000000000000000000000064`
+`yarn hardhat --network rinkeby verifyEtherscan --module 0x4242424242424242424242424242424242424242 --owner <owner_address> --avatar <avatar_address> --amb  0xD4075FB57fCf038bFc702c915Ef9592534bED5c1 --controller <xDai controller address> --chainid 0x0000000000000000000000000000000000000000000000000000000000000064`
 
 ### Enabling the module
 
