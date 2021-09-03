@@ -73,7 +73,7 @@ describe("AMBModule", async () => {
 
   describe("setUp()", async () => {
     it("throws if executor is address zero", async () => {
-      const { Module } = await setupTestWithTestExecutor();
+      const { Module } = await setupTestWithTestAvatar();
       await expect(
         Module.deploy(
           ZeroAddress,
@@ -117,9 +117,9 @@ describe("AMBModule", async () => {
       const calldata = module.interface.encodeFunctionData("setAmb", [
         amb.address,
       ]);
-      await expect(
-        avatar.exec(module.address, 0, calldata)
-      ).to.be.revertedWith("AMB address already set to this");
+      await expect(avatar.exec(module.address, 0, calldata)).to.be.revertedWith(
+        "AMB address already set to this"
+      );
     });
 
     it("updates AMB address", async () => {
@@ -151,9 +151,9 @@ describe("AMBModule", async () => {
       const calldata = module.interface.encodeFunctionData("setChainId", [
         currentChainID,
       ]);
-      await expect(
-        avatar.exec(module.address, 0, calldata)
-      ).to.be.revertedWith("chainId already set to this");
+      await expect(avatar.exec(module.address, 0, calldata)).to.be.revertedWith(
+        "chainId already set to this"
+      );
     });
 
     it("updates chainId", async () => {
@@ -188,9 +188,9 @@ describe("AMBModule", async () => {
       const calldata = module.interface.encodeFunctionData("setController", [
         currentController,
       ]);
-      await expect(
-        avatar.exec(module.address, 0, calldata)
-      ).to.be.revertedWith("controller already set to this");
+      await expect(avatar.exec(module.address, 0, calldata)).to.be.revertedWith(
+        "controller already set to this"
+      );
     });
 
     it("updates controller", async () => {
