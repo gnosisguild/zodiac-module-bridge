@@ -72,20 +72,6 @@ describe("AMBModule", async () => {
   const [user1] = waffle.provider.getWallets();
 
   describe("setUp()", async () => {
-    it("throws if its already initialized", async () => {
-      await baseSetup();
-      const Module = await hre.ethers.getContractFactory("AMBModule");
-      const module = await Module.deploy(
-        user1.address,
-        user1.address,
-        ZeroAddress,
-        ZeroAddress,
-        FortyTwo
-      );
-      await expect(module.setUp(initializeParams)).to.be.revertedWith(
-        "Module is already initialized"
-      );
-    });
     it("throws if executor is address zero", async () => {
       const { Module } = await setupTestWithTestExecutor();
       await expect(
@@ -97,6 +83,21 @@ describe("AMBModule", async () => {
           FortyTwo
         )
       ).to.be.revertedWith("Executor can not be zero address");
+    });
+
+    it("should emit event because of successful set up", async () => {
+      const Module = await hre.ethers.getContractFactory("AMBModule");
+      const module = await Module.deploy(
+        user1.address,
+        user1.address,
+        user1.address,
+        user1.address,
+        FortyTwo
+      );
+      await module.deployed();
+      await expect(module.deployTransaction)
+        .to.emit(module, "AmbModuleSetup")
+        .withArgs(user1.address, user1.address);
     });
   });
 
