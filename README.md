@@ -1,16 +1,19 @@
-# SafeBridge Module
-[![Build Status](https://github.com/gnosis/SafeBridge/workflows/SafeBridge/badge.svg?branch=safebridge)](https://github.com/gnosis/SafeBridge/actions)
-[![Coverage Status](https://coveralls.io/repos/github/gnosis/SafeBridge/badge.svg?branch=safebridge)](https://coveralls.io/github/gnosis/SafeBridge?branch=safebridge)
+# Bridge Module
+
+[![Build Status](https://github.com/gnosis/zodiac-module-bridge/workflows/zodiac-module-bridge/badge.svg?branch=main)](https://github.com/gnosis/zodiac-module-bridge/actions)
+[![Coverage Status](https://coveralls.io/repos/github/gnosis/zodiac-module-bridge/badge.svg?branch=safebridge)](https://coveralls.io/github/gnosis/zodiac-module-bridge?branch=main)
 
 This module allows for execution of transactions initiated by a designated address on the other side of a designated arbitrary message bridge (AMB).
 
 This module is intended to be used with the [Gnosis Safe](https://github.com/gnosis/safe-contracts).
 
 ### Features
+
 - Execute transactions initiated by an approved address on an approved chainId via an approved AMB.
 
 ### Flow
-- On chain (a), deploy a Gnosis Safe and SafeBridge Module. Enable Safe Bridge Module on the Safe.
+
+- On chain (a), deploy a Gnosis Safe and Bridge Module. Enable Safe Bridge Module on the Safe.
 - On chain (b), call `requireToPassMessage()` on the bridge contract.
 - On chain (a), call `executeSignatures()` on the bridge contract.
 
@@ -20,7 +23,7 @@ The contracts have been developed with [Solidity 0.8.0](https://github.com/ether
 
 ### Setup Guide
 
-Follow our [Setup Guide](./docs/setup_guide.md) to setup a SafeBridge module.
+Follow our [Setup Guide](./docs/setup_guide.md) to setup a Bridge module.
 
 ### Audits
 
