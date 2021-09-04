@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.0;
 
-import "@gnosis/zodiac/contracts/core/Module.sol";
+import "@zodiacdao/zodiac/contracts/core/Module.sol";
 
 interface IAMB {
     function messageSender() external view returns (address);
