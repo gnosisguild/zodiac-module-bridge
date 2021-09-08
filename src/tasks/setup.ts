@@ -9,7 +9,7 @@ const ZeroAddress = "0x0000000000000000000000000000000000000000";
 const Zero =
   "0x0000000000000000000000000000000000000000000000000000000000000000";
 
-task("setup", "deploy a SafeBridge Module")
+task("setup", "deploy an AMB Module")
   .addParam("owner", "Address of the owner", undefined, types.string)
   .addParam("avatar", "Address of the avatar", undefined, types.string)
   .addParam("amb", "Address of the AMB", undefined, types.string)
@@ -37,10 +37,10 @@ task("setup", "deploy a SafeBridge Module")
       taskArgs.chainid
     );
 
-    console.log("SafeBridge Module deployed to:", module.address);
+    console.log("AMB Module deployed to:", module.address);
   });
 
-task("factorySetup", "deploy a SafeBridge Module")
+task("factorySetup", "deploy a AMB Module")
   .addParam("factory", "Address of the Proxy Factory", undefined, types.string)
   .addParam(
     "mastercopy",
@@ -69,7 +69,7 @@ task("factorySetup", "deploy a SafeBridge Module")
 
     const FactoryAbi = [
       `function deployModule(
-          address masterCopy, 
+          address masterCopy,
           bytes memory initializer
       ) public returns (address proxy)`,
     ];
@@ -98,12 +98,7 @@ task("factorySetup", "deploy a SafeBridge Module")
   });
 
 task("verifyEtherscan", "Verifies the contract on etherscan")
-  .addParam(
-    "module",
-    "Address of the SafeBridge module",
-    undefined,
-    types.string
-  )
+  .addParam("module", "Address of the AMB module", undefined, types.string)
   .addParam("owner", "Address of the owner", undefined, types.string)
   .addParam(
     "avatar",

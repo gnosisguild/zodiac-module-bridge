@@ -24,7 +24,7 @@ task(
     const [caller] = await hardhatRuntime.ethers.getSigners();
     console.log("Using the account:", caller.address);
     const module = await hardhatRuntime.ethers.getContractAt(
-      "SafeBridgeModule",
+      "BridgeModule",
       "0x0000000000000000000000000000000000000000"
     );
     const moduleTx = await module.populateTransaction.executeTransaction(
