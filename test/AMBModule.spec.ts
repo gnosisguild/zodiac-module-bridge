@@ -40,8 +40,9 @@ describe("AMBModule", async () => {
     );
 
     initializeParams = new AbiCoder().encode(
-      ["address", "address", "address", "address", "bytes32"],
+      ["address", "address", "address", "address", "address", "bytes32"],
       [
+        executor.address,
         executor.address,
         executor.address,
         amb.address,
@@ -61,6 +62,7 @@ describe("AMBModule", async () => {
     const module = await Module.deploy(
       base.executor.address,
       base.executor.address,
+      base.executor.address,
       base.amb.address,
       base.signers[0].address,
       base.amb.messageSourceChainId()
@@ -78,6 +80,7 @@ describe("AMBModule", async () => {
       const module = await Module.deploy(
         user1.address,
         user1.address,
+        user1.address,
         ZeroAddress,
         ZeroAddress,
         FortyTwo
@@ -86,7 +89,8 @@ describe("AMBModule", async () => {
         "Module is already initialized"
       );
     });
-    it("throws if executor is address zero", async () => {
+
+    it("throws if avatar is address zero", async () => {
       const { Module } = await setupTestWithTestExecutor();
       await expect(
         Module.deploy(
@@ -94,9 +98,24 @@ describe("AMBModule", async () => {
           ZeroAddress,
           ZeroAddress,
           ZeroAddress,
+          ZeroAddress,
           FortyTwo
         )
       ).to.be.revertedWith("Executor can not be zero address");
+    });
+
+    it("throws if target is address zero", async () => {
+      const { Module } = await setupTestWithTestExecutor();
+      await expect(
+        Module.deploy(
+          ZeroAddress,
+          user1.address,
+          ZeroAddress,
+          ZeroAddress,
+          ZeroAddress,
+          FortyTwo
+        )
+      ).to.be.revertedWith("Target can not be zero address");
     });
   });
 
