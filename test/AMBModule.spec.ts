@@ -1,14 +1,12 @@
 import { expect } from "chai";
 import hre, { deployments, waffle } from "hardhat";
 import "@nomiclabs/hardhat-ethers";
-import { AbiCoder } from "ethers/lib/utils";
 
 const ZeroAddress = "0x0000000000000000000000000000000000000000";
 const FortyTwo =
   "0x000000000000000000000000000000000000000000000000000000000000002a";
 
 describe("AMBModule", async () => {
-  let initializeParams: string;
 
   const baseSetup = deployments.createFixture(async () => {
     await deployments.fixture();
@@ -39,16 +37,6 @@ describe("AMBModule", async () => {
       signers[1].address
     );
 
-    initializeParams = new AbiCoder().encode(
-      ["address", "address", "address", "address", "bytes32"],
-      [
-        avatar.address,
-        avatar.address,
-        amb.address,
-        signers[0].address,
-        await amb.messageSourceChainId(),
-      ]
-    );
 
     return { Avatar, avatar, module, mock, badMock, amb, badAmb, signers };
   });
@@ -59,6 +47,7 @@ describe("AMBModule", async () => {
     const provider = await hre.ethers.getDefaultProvider();
     const network = await provider.getNetwork();
     const module = await Module.deploy(
+      base.avatar.address,
       base.avatar.address,
       base.avatar.address,
       base.amb.address,
@@ -72,10 +61,11 @@ describe("AMBModule", async () => {
   const [user1] = waffle.provider.getWallets();
 
   describe("setUp()", async () => {
-    it("throws if executor is address zero", async () => {
+    it("throws if avatar is address zero", async () => {
       const { Module } = await setupTestWithTestAvatar();
       await expect(
         Module.deploy(
+          ZeroAddress,
           ZeroAddress,
           ZeroAddress,
           ZeroAddress,
@@ -92,12 +82,27 @@ describe("AMBModule", async () => {
         user1.address,
         user1.address,
         user1.address,
+        user1.address,
         FortyTwo
       );
       await module.deployed();
       await expect(module.deployTransaction)
         .to.emit(module, "AmbModuleSetup")
-        .withArgs(user1.address, user1.address);
+        .withArgs(user1.address, user1.address, user1.address, user1.address);
+    });
+
+    it("throws if target is address zero", async () => {
+      const { Module } = await setupTestWithTestAvatar();
+      await expect(
+        Module.deploy(
+          ZeroAddress,
+          user1.address,
+          ZeroAddress,
+          ZeroAddress,
+          ZeroAddress,
+          FortyTwo
+        )
+      ).to.be.revertedWith("Target can not be zero address");
     });
   });
 

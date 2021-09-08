@@ -9,7 +9,7 @@ const saltNonce = "0xfa";
 describe("Module works with factory", () => {
   const chainId = formatBytes32String("55")
 
-  const paramsTypes = ["address", "address", "address", "address", "bytes32"];
+  const paramsTypes = ["address", "address", "address", "address", "address", "bytes32"];
 
   const baseSetup = deployments.createFixture(async () => {
     await deployments.fixture();
@@ -22,6 +22,7 @@ describe("Module works with factory", () => {
       FirstAddress,
       FirstAddress,
       FirstAddress,
+      FirstAddress,
       formatBytes32String("0")
     );
 
@@ -30,11 +31,12 @@ describe("Module works with factory", () => {
 
   it("should throw because master copy is already initialized", async () => {
     const { masterCopy } = await baseSetup();
-    const [executor, amb, controller] = await ethers.getSigners();
+    const [avatar, amb, controller] = await ethers.getSigners();
 
     const encodedParams = new AbiCoder().encode(paramsTypes, [
-      executor.address,
-      executor.address,
+      avatar.address,
+      avatar.address,
+      avatar.address,
       amb.address,
       controller.address,
       chainId,
@@ -47,10 +49,11 @@ describe("Module works with factory", () => {
 
   it("should deploy new amb module proxy", async () => {
     const { factory, masterCopy } = await baseSetup();
-    const [executor, amb, controller] = await ethers.getSigners();
+    const [avatar, amb, controller] = await ethers.getSigners();
     const paramsValues = [
-      executor.address,
-      executor.address,
+      avatar.address,
+      avatar.address,
+      avatar.address,
       amb.address,
       controller.address,
       chainId,
