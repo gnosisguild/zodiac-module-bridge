@@ -30,14 +30,14 @@ contract AMBModule is Module {
     bytes32 public chainId;
 
     /// @param _owner Address of the  owner
-    /// @param _executor Address of the executor (e.g. a Safe)
+    /// @param _avatar Address of the avatar (e.g. a Safe)
     /// @param _target Address of the contract that will call exec function
     /// @param _amb Address of the AMB contract
     /// @param _controller Address of the authorized controller contract on the other side of the bridge
     /// @param _chainId Address of the authorized chainId from which owner can initiate transactions
     constructor(
         address _owner,
-        address _executor,
+        address _avatar,
         address _target,
         IAMB _amb,
         address _controller,
@@ -45,7 +45,7 @@ contract AMBModule is Module {
     ) {
         bytes memory initParams = abi.encode(
             _owner,
-            _executor,
+            _avatar,
             _target,
             _amb,
             _controller,
@@ -57,7 +57,7 @@ contract AMBModule is Module {
     function setUp(bytes memory initParams) public override {
         (
             address _owner,
-            address _executor,
+            address _avatar,
             address _target,
             IAMB _amb,
             address _controller,
@@ -65,9 +65,9 @@ contract AMBModule is Module {
         ) = abi.decode(initParams, (address, address, address, IAMB, address, bytes32));
         require(!initialized, "Module is already initialized");
         initialized = true;
-        require(_executor != address(0), "Executor can not be zero address");
+        require(_avatar != address(0), "Avatar can not be zero address");
         require(_target != address(0), "Target can not be zero address");
-        avatar = _executor;
+        avatar = _avatar;
         target = _target;
         amb = _amb;
         controller = _controller;
@@ -76,7 +76,7 @@ contract AMBModule is Module {
         __Ownable_init();
         transferOwnership(_owner);
 
-        emit AmbModuleSetup(msg.sender, _owner, _executor, _target);
+        emit AmbModuleSetup(msg.sender, _owner, _avatar, _target);
     }
 
     /// @dev Check that the amb, chainId, and owner are valid
@@ -89,7 +89,7 @@ contract AMBModule is Module {
 
     /// @dev Set the AMB contract address
     /// @param _amb Address of the AMB contract
-    /// @notice This can only be called by the executor
+    /// @notice This can only be called by the avatar
     function setAmb(address _amb) public onlyOwner {
         require(address(amb) != _amb, "AMB address already set to this");
         amb = IAMB(_amb);
@@ -97,7 +97,7 @@ contract AMBModule is Module {
 
     /// @dev Set the approved chainId
     /// @param _chainId ID of the approved network
-    /// @notice This can only be called by the executor
+    /// @notice This can only be called by the avatar
     function setChainId(bytes32 _chainId) public onlyOwner {
         require(chainId != _chainId, "chainId already set to this");
         chainId = _chainId;
@@ -105,7 +105,7 @@ contract AMBModule is Module {
 
     /// @dev Set the controller address
     /// @param _controller Set the address of controller on the other side of the bridge
-    /// @notice This can only be called by the executor
+    /// @notice This can only be called by the avatar
     function setController(address _controller) public onlyOwner {
         require(controller != _controller, "controller already set to this");
         controller = _controller;
