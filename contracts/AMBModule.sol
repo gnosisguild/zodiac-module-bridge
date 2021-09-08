@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.0;
 
-import "@gnosis/zodiac/contracts/core/Module.sol";
+import "@gnosis.pm/zodiac/contracts/core/Module.sol";
 
 interface IAMB {
     function messageSender() external view returns (address);
@@ -18,7 +18,12 @@ interface IAMB {
 }
 
 contract AMBModule is Module {
-    event AmbModuleSetup(address indexed initiator, address indexed safe);
+    event AmbModuleSetup(
+        address indexed initiator,
+        address indexed owner,
+        address indexed avatar,
+        address target
+    );
 
     IAMB public amb;
     address public controller;
@@ -26,12 +31,14 @@ contract AMBModule is Module {
 
     /// @param _owner Address of the  owner
     /// @param _executor Address of the executor (e.g. a Safe)
+    /// @param _target Address of the contract that will call exec function
     /// @param _amb Address of the AMB contract
     /// @param _controller Address of the authorized controller contract on the other side of the bridge
     /// @param _chainId Address of the authorized chainId from which owner can initiate transactions
     constructor(
         address _owner,
         address _executor,
+        address _target,
         IAMB _amb,
         address _controller,
         bytes32 _chainId
@@ -39,6 +46,7 @@ contract AMBModule is Module {
         bytes memory initParams = abi.encode(
             _owner,
             _executor,
+            _target,
             _amb,
             _controller,
             _chainId
@@ -50,14 +58,17 @@ contract AMBModule is Module {
         (
             address _owner,
             address _executor,
+            address _target,
             IAMB _amb,
             address _controller,
             bytes32 _chainId
-        ) = abi.decode(initParams, (address, address, IAMB, address, bytes32));
+        ) = abi.decode(initParams, (address, address, address, IAMB, address, bytes32));
         require(!initialized, "Module is already initialized");
         initialized = true;
         require(_executor != address(0), "Executor can not be zero address");
+        require(_target != address(0), "Target can not be zero address");
         avatar = _executor;
+        target = _target;
         amb = _amb;
         controller = _controller;
         chainId = _chainId;
@@ -65,7 +76,7 @@ contract AMBModule is Module {
         __Ownable_init();
         transferOwnership(_owner);
 
-        emit AmbModuleSetup(msg.sender, _executor);
+        emit AmbModuleSetup(msg.sender, _owner, _executor, _target);
     }
 
     /// @dev Check that the amb, chainId, and owner are valid
