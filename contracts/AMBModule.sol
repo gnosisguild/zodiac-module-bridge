@@ -63,8 +63,8 @@ contract AMBModule is Module {
             address _controller,
             bytes32 _chainId
         ) = abi.decode(initParams, (address, address, address, IAMB, address, bytes32));
-        require(!initialized, "Module is already initialized");
-        initialized = true;
+        __Ownable_init();
+
         require(_avatar != address(0), "Avatar can not be zero address");
         require(_target != address(0), "Target can not be zero address");
         avatar = _avatar;
@@ -73,7 +73,6 @@ contract AMBModule is Module {
         controller = _controller;
         chainId = _chainId;
 
-        __Ownable_init();
         transferOwnership(_owner);
 
         emit AmbModuleSetup(msg.sender, _owner, _avatar, _target);
