@@ -1,6 +1,6 @@
 # Bridge Module
 
-[![Build Status](https://github.com/gnosis/zodiac-module-bridge/workflows/zodiac-module-bridge/badge.svg?branch=main)](https://github.com/gnosis/zodiac-module-bridge/actions)
+[![Build Status](https://github.com/gnosis/zodiac-module-bridge/actions/workflows/ci.yml/badge.svg)](https://github.com/gnosis/zodiac-module-bridge/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/github/gnosis/zodiac-module-bridge/badge.svg?branch=safebridge)](https://coveralls.io/github/gnosis/zodiac-module-bridge?branch=main)
 
 This module allows for execution of transactions initiated by a designated address on the other side of a designated arbitrary message bridge (AMB).
