@@ -1,17 +1,78 @@
 import "hardhat-deploy";
 import "@nomiclabs/hardhat-ethers";
 import { task, types } from "hardhat/config";
-import { Contract } from "ethers";
-import { AbiCoder } from "ethers/lib/utils";
+import { HardhatRuntimeEnvironment } from "hardhat/types";
+import { deployAndSetUpModule } from "@gnosis.pm/zodiac";
+import { formatBytes32String } from "ethers/lib/utils";
 
-const FirstAddress = "0x0000000000000000000000000000000000000001";
-const ZeroAddress = "0x0000000000000000000000000000000000000000";
-const Zero =
-  "0x0000000000000000000000000000000000000000000000000000000000000000";
+interface BridgeTaskArgs {
+  owner: string;
+  avatar: string;
+  target: string;
+  amb: string;
+  controller: string;
+  chainid: string;
+  proxied: boolean;
+}
+
+const deployBridgeModule = async (
+  taskArgs: BridgeTaskArgs,
+  hardhatRuntime: HardhatRuntimeEnvironment
+) => {
+  const [caller] = await hardhatRuntime.ethers.getSigners();
+  console.log("Using the account:", caller.address);
+  const bridgeChainId = formatBytes32String(taskArgs.chainid);
+
+  if (taskArgs.proxied) {
+    const chainId = await hardhatRuntime.getChainId();
+    const { transaction } = deployAndSetUpModule(
+      "bridge",
+      {
+        types: [
+          "address",
+          "address",
+          "address",
+          "address",
+          "address",
+          "bytes32",
+        ],
+        values: [
+          taskArgs.owner,
+          taskArgs.avatar,
+          taskArgs.target,
+          taskArgs.amb,
+          taskArgs.controller,
+          bridgeChainId,
+        ],
+      },
+      hardhatRuntime.ethers.provider,
+      Number(chainId),
+      Date.now().toString()
+    );
+
+    const deploymentTransaction = await caller.sendTransaction(transaction);
+    const receipt = await deploymentTransaction.wait();
+    console.log("Bridge module deployed to:", receipt.logs[1].address);
+    return;
+  }
+
+  const Module = await hardhatRuntime.ethers.getContractFactory("AMBModule");
+  const module = await Module.deploy(
+    taskArgs.owner,
+    taskArgs.avatar,
+    taskArgs.target,
+    taskArgs.amb,
+    taskArgs.controller,
+    bridgeChainId
+  );
+
+  console.log("Bridge module deployed to:", module.address);
+};
 
 task("setup", "deploy an AMB Module")
   .addParam("owner", "Address of the owner", undefined, types.string)
   .addParam("avatar", "Address of the avatar", undefined, types.string)
+  .addParam("target", "Address of the target", undefined, types.string)
   .addParam("amb", "Address of the AMB", undefined, types.string)
   .addParam(
     "controller",
@@ -25,77 +86,14 @@ task("setup", "deploy an AMB Module")
     undefined,
     types.string
   )
-  .setAction(async (taskArgs, hardhatRuntime) => {
-    const [caller] = await hardhatRuntime.ethers.getSigners();
-    console.log("Using the account:", caller.address);
-    const Module = await hardhatRuntime.ethers.getContractFactory("AMBModule");
-    const module = await Module.deploy(
-      taskArgs.owner,
-      taskArgs.avatar,
-      taskArgs.amb,
-      taskArgs.controller,
-      taskArgs.chainid
-    );
-
-    console.log("AMB Module deployed to:", module.address);
-  });
-
-task("factorySetup", "deploy a AMB Module")
-  .addParam("factory", "Address of the Proxy Factory", undefined, types.string)
   .addParam(
-    "mastercopy",
-    "Address of the AMB Module Master Copy",
-    undefined,
-    types.string
+    "proxied",
+    "Deploys contract through factory",
+    false,
+    types.boolean,
+    true
   )
-  .addParam("owner", "Address of the owner", undefined, types.string)
-  .addParam("avatar", "Address of the avatar", undefined, types.string)
-  .addParam("amb", "Address of the AMB", undefined, types.string)
-  .addParam(
-    "controller",
-    "Address of the controller on the other side of the AMB",
-    undefined,
-    types.string
-  )
-  .addParam(
-    "chainid",
-    "Chain ID on the other side of the AMB",
-    undefined,
-    types.string
-  )
-  .setAction(async (taskArgs, hardhatRuntime) => {
-    const [caller] = await hardhatRuntime.ethers.getSigners();
-    console.log("Using the account:", caller.address);
-
-    const FactoryAbi = [
-      `function deployModule(
-          address masterCopy,
-          bytes memory initializer
-      ) public returns (address proxy)`,
-    ];
-
-    const Factory = new Contract(taskArgs.factory, FactoryAbi, caller);
-    const Module = await hardhatRuntime.ethers.getContractFactory("AMBModule");
-    const encodedParams = new AbiCoder().encode(
-      ["address", "address", "address", "address", "bytes32"],
-      [
-        taskArgs.owner,
-        taskArgs.avatar,
-        taskArgs.amb,
-        taskArgs.controller,
-        taskArgs.chainid,
-      ]
-    );
-    const initParams = Module.interface.encodeFunctionData("setUp", [
-      encodedParams,
-    ]);
-
-    const receipt = await Factory.deployModule(
-      taskArgs.mastercopy,
-      initParams
-    ).then((tx: any) => tx.wait(3));
-    console.log("Module deployed to:", receipt.logs[1].address);
-  });
+  .setAction(deployBridgeModule);
 
 task("verifyEtherscan", "Verifies the contract on etherscan")
   .addParam("module", "Address of the AMB module", undefined, types.string)
@@ -119,46 +117,20 @@ task("verifyEtherscan", "Verifies the contract on etherscan")
     undefined,
     types.string
   )
-  .setAction(async (taskArgs, hardhatRuntime) => {
-    await hardhatRuntime.run("verify", {
-      address: taskArgs.module,
-      constructorArgsParams: [
-        taskArgs.owner,
-        taskArgs.avatar,
-        taskArgs.amb,
-        taskArgs.controller,
-        taskArgs.chainid,
-      ],
-    });
-  });
-
-task("deployMasterCopy", "deploy a master copy of AMB Module").setAction(
-  async (_, hardhatRuntime) => {
-    const [caller] = await hardhatRuntime.ethers.getSigners();
-    console.log("Using the account:", caller.address);
-    const Module = await hardhatRuntime.ethers.getContractFactory("AMBModule");
-    const module = await Module.deploy(
-      FirstAddress,
-      FirstAddress,
-      ZeroAddress,
-      ZeroAddress,
-      Zero
-    );
-
-    await module.deployTransaction.wait(3);
-
-    console.log("Module deployed to:", module.address);
-    await hardhatRuntime.run("verify:verify", {
-      address: module.address,
-      constructorArguments: [
-        FirstAddress,
-        FirstAddress,
-        ZeroAddress,
-        ZeroAddress,
-        Zero,
-      ],
-    });
-  }
-);
+  .setAction(
+    async (taskArgs: BridgeTaskArgs & { module: string }, hardhatRuntime) => {
+      await hardhatRuntime.run("verify", {
+        address: taskArgs.module,
+        constructorArgsParams: [
+          taskArgs.owner,
+          taskArgs.avatar,
+          taskArgs.target,
+          taskArgs.amb,
+          taskArgs.controller,
+          taskArgs.chainid,
+        ],
+      });
+    }
+  );
 
 export {};
