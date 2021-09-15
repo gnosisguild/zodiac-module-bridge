@@ -62,6 +62,10 @@ export default {
       ...sharedNetworkConfig,
       url: "https://xdai.poanetwork.dev",
     },
+    matic: {
+      ...sharedNetworkConfig,
+      url: "https://rpc-mainnet.maticvigil.com"
+    }
   },
   namedAccounts: {
     deployer: 0,
