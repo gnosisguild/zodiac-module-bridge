@@ -29,9 +29,9 @@ Follow our [Setup Guide](./docs/setup_guide.md) to setup a Bridge module.
 
 An audit has been performed by the [G0 group](https://github.com/g0-group).
 
-No serious issues have been discovered.
+No issues have been discovered.
 
-The audit results are available as a pdf in [this repo](./docs/GnosisSafeBridgeMay2021.pdf) or on the [g0-group repo](https://github.com/g0-group/Audits/blob/master/GnosisSafeBridgeMay2021.pdf).
+The audit results are available as a pdf in [this repo](./docs/ZodiacAMBModuleSep2021.pdf) or on the [g0-group repo](https://github.com/g0-group/Audits/blob/e11752abb010f74e32a6fc61142032a10deed578/ZodiacAMBModuleSep2021.pdf).
 
 ### Security and Liability
 
