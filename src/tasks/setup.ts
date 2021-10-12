@@ -11,7 +11,7 @@ interface BridgeTaskArgs {
   target: string;
   amb: string;
   controller: string;
-  chainid: string;
+  chainid: number;
   proxied: boolean;
 }
 
@@ -21,7 +21,7 @@ const deployBridgeModule = async (
 ) => {
   const [caller] = await hardhatRuntime.ethers.getSigners();
   console.log("Using the account:", caller.address);
-  const bridgeChainId = formatBytes32String(taskArgs.chainid);
+  const bridgeChainId = intToBytes32HexString(taskArgs.chainid);
 
   if (taskArgs.proxied) {
     const chainId = await hardhatRuntime.getChainId();
@@ -84,7 +84,7 @@ task("setup", "deploy an AMB Module")
     "chainid",
     "Chain ID on the other side of the AMB",
     undefined,
-    types.string
+    types.int
   )
   .addParam(
     "proxied",
@@ -104,6 +104,7 @@ task("verifyEtherscan", "Verifies the contract on etherscan")
     undefined,
     types.string
   )
+  .addParam("target", "Address of the target", undefined, types.string)
   .addParam("amb", "Address of the AMB", undefined, types.string)
   .addParam(
     "controller",
@@ -127,10 +128,16 @@ task("verifyEtherscan", "Verifies the contract on etherscan")
           taskArgs.target,
           taskArgs.amb,
           taskArgs.controller,
-          taskArgs.chainid,
+          intToBytes32HexString(taskArgs.chainid),
         ],
       });
     }
   );
 
 export {};
+
+function intToBytes32HexString(i: number): string {
+  // convert to hex string
+  // pad left with zeros up until 64 -> 32 bytes
+  return `0x${i.toString(16).padStart(64, "0")}`;
+}
