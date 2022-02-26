@@ -18,7 +18,7 @@ interface IFxMessageProcessor {
 }
 
 /***
- * @title PolyFxPortalModule
+ * @title MaticBridgeModule
  * @notice A module for Gnosys Safe, compatible to Zodiac extension pack, that allows
  * an address on the mainnet (or Goerli) to control an avatar on Polygon (or Mumbai)
  * sending messages via the "Fx-Portal", a message bridge run by the Polygon team
