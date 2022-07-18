@@ -1,4 +1,4 @@
-name: Bridge
+name: tests
 on: [push]
 
 jobs:
