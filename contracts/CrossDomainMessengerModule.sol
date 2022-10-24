@@ -3,53 +3,39 @@ pragma solidity >=0.8.0;
 
 import "@gnosis.pm/zodiac/contracts/core/Module.sol";
 
-interface IAMB {
-  function messageSender() external view returns (address);
-
-  function messageId() external view returns (bytes32);
-
-  function messageSourceChainId() external view returns (bytes32);
-
-  function requireToPassMessage(
-    address _contract,
-    bytes memory _data,
-    uint256 _gas
-  ) external returns (bytes32);
+interface ICrossDomainMessenger {
+  function xDomainMessageSender() external view returns (address);
 }
 
-contract AMBModule is Module {
-  event AmbModuleSetup(
+contract CrossDomainMessengerModule is Module {
+  event CrossDomainMessengerModuleSetup(
     address indexed initiator,
     address indexed owner,
     address indexed avatar,
     address target
   );
 
-  IAMB public amb;
+  ICrossDomainMessenger public crossDomainMessenger;
   address public controller;
-  bytes32 public chainId;
 
   /// @param _owner Address of the  owner
   /// @param _avatar Address of the avatar (e.g. a Safe)
   /// @param _target Address of the contract that will call exec function
-  /// @param _amb Address of the AMB contract
+  /// @param _crossDomainMessenger Address of the CrossDomainMessenger contract
   /// @param _controller Address of the authorized controller contract on the other side of the bridge
-  /// @param _chainId Address of the authorized chainId from which owner can initiate transactions
   constructor(
     address _owner,
     address _avatar,
     address _target,
-    IAMB _amb,
-    address _controller,
-    bytes32 _chainId
+    ICrossDomainMessenger _crossDomainMessenger,
+    address _controller
   ) {
     bytes memory initParams = abi.encode(
       _owner,
       _avatar,
       _target,
-      _amb,
-      _controller,
-      _chainId
+      _crossDomainMessenger,
+      _controller
     );
     setUp(initParams);
   }
@@ -59,12 +45,11 @@ contract AMBModule is Module {
       address _owner,
       address _avatar,
       address _target,
-      IAMB _amb,
-      address _controller,
-      bytes32 _chainId
+      ICrossDomainMessenger _crossDomainMessenger,
+      address _controller
     ) = abi.decode(
         initParams,
-        (address, address, address, IAMB, address, bytes32)
+        (address, address, address, ICrossDomainMessenger, address)
       );
     __Ownable_init();
 
@@ -72,37 +57,39 @@ contract AMBModule is Module {
     require(_target != address(0), "Target can not be zero address");
     avatar = _avatar;
     target = _target;
-    amb = _amb;
+    crossDomainMessenger = _crossDomainMessenger;
     controller = _controller;
-    chainId = _chainId;
 
     transferOwnership(_owner);
 
-    emit AmbModuleSetup(msg.sender, _owner, _avatar, _target);
+    emit CrossDomainMessengerModuleSetup(msg.sender, _owner, _avatar, _target);
   }
 
-  /// @dev Check that the amb, chainId, and owner are valid
+  /// @dev Check that the crossDomainMessenger, and owner are valid
   modifier onlyValid() {
-    require(msg.sender == address(amb), "Unauthorized amb");
-    require(amb.messageSourceChainId() == chainId, "Unauthorized chainId");
-    require(amb.messageSender() == controller, "Unauthorized controller");
+    require(
+      msg.sender == address(crossDomainMessenger),
+      "Unauthorized crossDomainMessenger"
+    );
+    require(
+      crossDomainMessenger.xDomainMessageSender() == controller,
+      "Unauthorized controller"
+    );
     _;
   }
 
-  /// @dev Set the AMB contract address
-  /// @param _amb Address of the AMB contract
+  /// @dev Set the CrossDomainMessenger contract address
+  /// @param _crossDomainMessenger Address of the CrossDomainMessenger contract
   /// @notice This can only be called by the owner
-  function setAmb(address _amb) public onlyOwner {
-    require(address(amb) != _amb, "AMB address already set to this");
-    amb = IAMB(_amb);
-  }
-
-  /// @dev Set the approved chainId
-  /// @param _chainId ID of the approved network
-  /// @notice This can only be called by the owner
-  function setChainId(bytes32 _chainId) public onlyOwner {
-    require(chainId != _chainId, "chainId already set to this");
-    chainId = _chainId;
+  function setCrossDomainMessenger(address _crossDomainMessenger)
+    public
+    onlyOwner
+  {
+    require(
+      address(crossDomainMessenger) != _crossDomainMessenger,
+      "CrossDomainMessenger address already set to this"
+    );
+    crossDomainMessenger = ICrossDomainMessenger(_crossDomainMessenger);
   }
 
   /// @dev Set the controller address
@@ -113,7 +100,7 @@ contract AMBModule is Module {
     controller = _controller;
   }
 
-  /// @dev Executes a transaction initated by the AMB
+  /// @dev Executes a transaction initated by the CrossDomainMessenger
   /// @param to Target of the transaction that should be executed
   /// @param value Wei value of the transaction that should be executed
   /// @param data Data of the transaction that should be executed
