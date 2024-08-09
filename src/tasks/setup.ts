@@ -1,9 +1,12 @@
 import "hardhat-deploy";
-import "@nomiclabs/hardhat-ethers";
+import "@nomicfoundation/hardhat-ethers";
 import { task, types } from "hardhat/config";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { deployAndSetUpModule } from "@gnosis.pm/zodiac";
-import { formatBytes32String } from "ethers/lib/utils";
+import {
+  encodeDeployProxy,
+  readMastercopyArtifact,
+  predictProxyAddress,
+} from "zodiac-core";
 
 interface BridgeTaskArgs {
   owner: string;
@@ -19,40 +22,38 @@ const deployBridgeModule = async (
   taskArgs: BridgeTaskArgs,
   hardhatRuntime: HardhatRuntimeEnvironment
 ) => {
-  const [caller] = await hardhatRuntime.ethers.getSigners();
-  console.log("Using the account:", caller.address);
+  const [deployer] = await hardhatRuntime.ethers.getSigners();
+  const nonce = await deployer.getNonce();
+  console.log("Using the account:", deployer.address);
   const bridgeChainId = intToBytes32HexString(taskArgs.chainid);
+  const masterCopyArtifact = await readMastercopyArtifact({
+    contractName: "AMBModule",
+  });
+  if (taskArgs.proxied && masterCopyArtifact) {
+    const mastercopy = masterCopyArtifact.address;
+    const setupArgs = {
+      types: ["address", "address", "address", "address", "address", "bytes32"],
+      values: [
+        taskArgs.owner,
+        taskArgs.avatar,
+        taskArgs.target,
+        taskArgs.amb,
+        taskArgs.controller,
+        bridgeChainId,
+      ],
+    };
+    const transaction = encodeDeployProxy({
+      mastercopy,
+      setupArgs,
+      saltNonce: nonce,
+    });
 
-  if (taskArgs.proxied) {
-    const chainId = await hardhatRuntime.getChainId();
-    const { transaction } = deployAndSetUpModule(
-      "bridge",
-      {
-        types: [
-          "address",
-          "address",
-          "address",
-          "address",
-          "address",
-          "bytes32",
-        ],
-        values: [
-          taskArgs.owner,
-          taskArgs.avatar,
-          taskArgs.target,
-          taskArgs.amb,
-          taskArgs.controller,
-          bridgeChainId,
-        ],
-      },
-      hardhatRuntime.ethers.provider,
-      Number(chainId),
-      Date.now().toString()
+    const deploymentTransaction = await deployer.sendTransaction(transaction);
+    await deploymentTransaction.wait();
+    console.log(
+      "Bridge module deployed to:",
+      predictProxyAddress({ mastercopy, setupArgs, saltNonce: nonce })
     );
-
-    const deploymentTransaction = await caller.sendTransaction(transaction);
-    const receipt = await deploymentTransaction.wait();
-    console.log("Bridge module deployed to:", receipt.logs[1].address);
     return;
   }
 
@@ -65,8 +66,8 @@ const deployBridgeModule = async (
     taskArgs.controller,
     bridgeChainId
   );
-
-  console.log("Bridge module deployed to:", module.address);
+  const moduleAddress = await module.getAddress();
+  console.log("Bridge module deployed to:", moduleAddress);
 };
 
 task("setup", "deploy an AMB Module")

@@ -1,5 +1,5 @@
 import "hardhat-deploy";
-import "@nomiclabs/hardhat-ethers";
+import "@nomicfoundation/hardhat-ethers";
 import { task, types } from "hardhat/config";
 
 task(
@@ -27,7 +27,7 @@ task(
       "BridgeModule",
       "0x0000000000000000000000000000000000000000"
     );
-    const moduleTx = await module.populateTransaction.executeTransaction(
+    const moduleTx = await module.executeTransaction.populateTransaction(
       taskArgs.to,
       `${taskArgs.value}`,
       taskArgs.data,
@@ -56,7 +56,7 @@ task(
       "IAMB",
       "0x0000000000000000000000000000000000000000"
     );
-    const ambTx = await amb.populateTransaction.requireToPassMessage(
+    const ambTx = await amb.requireToPassMessage.populateTransaction(
       taskArgs.to,
       taskArgs.data,
       `${taskArgs.gas}`

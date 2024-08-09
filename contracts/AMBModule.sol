@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity >=0.8.0;
 
-import "@gnosis.pm/zodiac/contracts/core/Module.sol";
+import "zodiac-core/contracts/core/Module.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 interface IAMB {
   function messageSender() external view returns (address);
@@ -42,7 +43,7 @@ contract AMBModule is Module {
     IAMB _amb,
     address _controller,
     bytes32 _chainId
-  ) {
+  ) {    
     bytes memory initParams = abi.encode(
       _owner,
       _avatar,
@@ -54,7 +55,7 @@ contract AMBModule is Module {
     setUp(initParams);
   }
 
-  function setUp(bytes memory initParams) public override {
+  function setUp(bytes memory initParams) public override initializer {
     (
       address _owner,
       address _avatar,
@@ -65,8 +66,7 @@ contract AMBModule is Module {
     ) = abi.decode(
         initParams,
         (address, address, address, IAMB, address, bytes32)
-      );
-    __Ownable_init();
+      );          
 
     require(_avatar != address(0), "Avatar can not be zero address");
     require(_target != address(0), "Target can not be zero address");
@@ -76,7 +76,7 @@ contract AMBModule is Module {
     controller = _controller;
     chainId = _chainId;
 
-    transferOwnership(_owner);
+    _transferOwnership(_owner);
 
     emit AmbModuleSetup(msg.sender, _owner, _avatar, _target);
   }

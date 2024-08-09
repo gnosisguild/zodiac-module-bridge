@@ -1,23 +1,30 @@
-import "@nomiclabs/hardhat-etherscan";
-import "@nomiclabs/hardhat-waffle";
-import "solidity-coverage";
+import "@nomicfoundation/hardhat-toolbox";
+import "@nomicfoundation/hardhat-verify";
+import "@nomicfoundation/hardhat-ethers";
+import "hardhat-gas-reporter";
 import "hardhat-deploy";
 import dotenv from "dotenv";
-import type { HttpNetworkUserConfig } from "hardhat/types";
 import yargs from "yargs";
+import { hideBin } from "yargs/helpers";
+import type { HttpNetworkUserConfig } from "hardhat/types";
 
-const argv = yargs
+const argv = yargs(hideBin(process.argv))
   .option("network", {
     type: "string",
     default: "hardhat",
+    describe: "The network to connect to",
   })
   .help(false)
-  .version(false).argv;
+  .version(false)
+  .parseSync();
 
 // Load environment variables.
 dotenv.config();
 const { INFURA_KEY, MNEMONIC, ETHERSCAN_API_KEY, PK } = process.env;
 
+import "./src/tasks/mastercopy-extract";
+import "./src/tasks/mastercopy-deploy";
+import "./src/tasks/mastercopy-verify";
 import "./src/tasks/setup";
 import "./src/tasks/encodeTx";
 
@@ -33,7 +40,7 @@ if (PK) {
   };
 }
 
-if (["rinkeby", "mainnet"].includes(argv.network) && INFURA_KEY === undefined) {
+if (["sepolia", "mainnet"].includes(argv.network) && INFURA_KEY === undefined) {
   throw new Error(
     `Could not find Infura key in env, unable to connect to network ${argv.network}`
   );
@@ -47,20 +54,31 @@ export default {
     sources: "contracts",
   },
   solidity: {
-    compilers: [{ version: "0.8.0" }, { version: "0.6.12" }],
+    compilers: [
+      { version: "0.8.20" },
+      { version: "0.8.0" },
+      { version: "0.6.12" },
+    ],
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 100,
+      },
+    },
   },
   networks: {
+    hardhat: {
+      allowUnlimitedContractSize: true,
+      blockGasLimit: 100000000,
+      gas: 100000000,
+    },
     mainnet: {
       ...sharedNetworkConfig,
       url: `https://mainnet.infura.io/v3/${INFURA_KEY}`,
     },
-    rinkeby: {
+    sepolia: {
       ...sharedNetworkConfig,
-      url: `https://rinkeby.infura.io/v3/${INFURA_KEY}`,
-    },
-    goerli: {
-      ...sharedNetworkConfig,
-      url: `https://goerli.infura.io/v3/${INFURA_KEY}`,
+      url: `https://sepolia.infura.io/v3/${INFURA_KEY}`,
     },
     xdai: {
       ...sharedNetworkConfig,
@@ -69,6 +87,30 @@ export default {
     matic: {
       ...sharedNetworkConfig,
       url: "https://rpc-mainnet.maticvigil.com",
+    },
+    mumbai: {
+      ...sharedNetworkConfig,
+      url: `https://polygon-mumbai.infura.io/v3/${INFURA_KEY}`,
+    },
+    polygon: {
+      ...sharedNetworkConfig,
+      url: `https://polygon-mainnet.infura.io/v3/${INFURA_KEY}`,
+    },
+    volta: {
+      ...sharedNetworkConfig,
+      url: `https://volta-rpc.energyweb.org`,
+    },
+    bsc: {
+      ...sharedNetworkConfig,
+      url: `https://bsc-dataseed.binance.org/`,
+    },
+    arbitrum: {
+      ...sharedNetworkConfig,
+      url: `https://arb1.arbitrum.io/rpc`,
+    },
+    avalanche: {
+      ...sharedNetworkConfig,
+      url: `https://api.avax.network/ext/bc/C/rpc`,
     },
   },
   namedAccounts: {
