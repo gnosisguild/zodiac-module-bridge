@@ -3,7 +3,7 @@ import hre, { ethers } from "hardhat";
 import "@nomicfoundation/hardhat-ethers";
 import { AbiCoder, encodeBytes32String, ZeroHash } from "ethers";
 import createAdapter from "./createEIP1193";
-import { deployFactories, deployMastercopy, deployProxy } from "zodiac-core";
+import { deployFactories, deployMastercopy, deployProxy } from "@gnosis-guild/zodiac-core";
 import { AMBModule__factory } from "../typechain-types";
 
 const FirstAddress = "0x0000000000000000000000000000000000000001";

@@ -22,11 +22,12 @@ const argv = yargs(hideBin(process.argv))
 dotenv.config();
 const { INFURA_KEY, MNEMONIC, ETHERSCAN_API_KEY, PK } = process.env;
 
-import "./src/tasks/mastercopy-extract";
-import "./src/tasks/mastercopy-deploy";
-import "./src/tasks/mastercopy-verify";
-import "./src/tasks/setup";
-import "./src/tasks/encodeTx";
+import "./tasks/reconstruct-mastercopy";
+import "./tasks/deploy-mastercopies";
+import "./tasks/deploy-mastercopy";
+import "./tasks/extract-mastercopy";
+import "./tasks/verify-mastercopies";
+import "./tasks/verify-mastercopy";
 
 const DEFAULT_MNEMONIC =
   "candy maple cake sugar pudding cream honey rich smooth crumble sweet treat";

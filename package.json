@@ -9,9 +9,11 @@
     "build": "hardhat compile",
     "test": "hardhat test",
     "deploy": "hardhat deploy --network",
-    "extract-mastercopy": "yarn run build && yarn hardhat mastercopy:extract",
-    "deploy-mastercopy": "yarn hardhat mastercopy:deploy --network",
-    "verify-mastercopy": "yarn hardhat mastercopy:verify --network",
+    "extract:mastercopy": "yarn run build && yarn hardhat extract:mastercopy",
+    "deploy:mastercopies": "yarn hardhat deploy:mastercopies --network",
+    "deploy:mastercopy": "yarn hardhat deploy:mastercopy --network",
+    "verify:mastercopies": "yarn hardhat verify:mastercopies --network",
+    "verify:mastercopy": "yarn hardhat verify:mastercopy --network",
     "coverage": "hardhat coverage",
     "lint": "yarn lint:sol && yarn lint:ts",
     "lint:sol": "solhint 'contracts/**/*.sol'",
@@ -27,6 +29,7 @@
   "author": "richard@gnosis.io",
   "license": "MIT",
   "devDependencies": {
+    "@gnosis-guild/zodiac-core": "^2.0.0",
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.7",
     "@nomicfoundation/hardhat-ignition": "^0.15.5",
     "@nomicfoundation/hardhat-ignition-ethers": "^0.15.5",
@@ -60,8 +63,7 @@
     "solidity-coverage": "^0.8.12",
     "ts-node": "^10.9.2",
     "typechain": "^8.3.2",
-    "typescript": "^5.5.4",
-    "zodiac-core": "file:../zodiac-core"
+    "typescript": "^5.5.4"
   },
   "dependencies": {
     "@gnosis.pm/mock-contract": "^4.0.0",

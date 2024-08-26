@@ -1,14 +1,11 @@
+import { EIP1193Provider } from "@gnosis-guild/zodiac-core";
 import { Signer } from "ethers";
-import { EIP1193Provider } from "zodiac-core";
 import { EthereumProvider } from "hardhat/types";
 
-export default function createAdapter({
-  provider,
-  signer,
-}: {
-  provider: EthereumProvider;
-  signer: Signer;
-}): EIP1193Provider {
+export function createEIP1193(
+  provider: EthereumProvider,
+  signer: Signer,
+): EIP1193Provider {
   return {
     request: async ({ method, params }) => {
       if (method == "eth_sendTransaction") {
