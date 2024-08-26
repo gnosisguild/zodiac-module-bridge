@@ -43,7 +43,7 @@ contract AMBModule is Module {
     IAMB _amb,
     address _controller,
     bytes32 _chainId
-  ) {    
+  ) {
     bytes memory initParams = abi.encode(
       _owner,
       _avatar,
@@ -66,7 +66,7 @@ contract AMBModule is Module {
     ) = abi.decode(
         initParams,
         (address, address, address, IAMB, address, bytes32)
-      );          
+      );
 
     require(_avatar != address(0), "Avatar can not be zero address");
     require(_target != address(0), "Target can not be zero address");
