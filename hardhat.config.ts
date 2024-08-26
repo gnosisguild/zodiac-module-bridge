@@ -22,7 +22,6 @@ const argv = yargs(hideBin(process.argv))
 dotenv.config();
 const { INFURA_KEY, MNEMONIC, ETHERSCAN_API_KEY, PK } = process.env;
 
-import "./tasks/reconstruct-mastercopy";
 import "./tasks/deploy-mastercopies";
 import "./tasks/deploy-mastercopy";
 import "./tasks/extract-mastercopy";
