@@ -2,7 +2,7 @@
 pragma solidity >=0.8.0;
 
 import "@gnosis-guild/zodiac-core/contracts/core/Module.sol";
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+
 
 interface IAMB {
   function messageSender() external view returns (address);
