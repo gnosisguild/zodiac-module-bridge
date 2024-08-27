@@ -1,12 +1,12 @@
-import { time } from "console";
-import hre, { deployments, ethers, waffle } from "hardhat";
+import hre, { deployments, ethers } from "hardhat";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 export const nextBlockTime = async (
   hre: HardhatRuntimeEnvironment,
   timestamp: number
 ) => {
-  await hre.ethers.provider.send("evm_setNextBlockTimestamp", [timestamp]);
+  await hre.network.provider.send("evm_setNextBlockTimestamp", [timestamp]);
+  await hre.network.provider.send("evm_mine");
 };
 
 export const increaseBlockTime = async (
@@ -14,7 +14,7 @@ export const increaseBlockTime = async (
   seconds: number
 ) => {
   const block = await hre.ethers.provider.getBlock("latest");
-  await nextBlockTime(hre, block.timestamp + seconds);
+  block && (await nextBlockTime(hre, block.timestamp + seconds));
 };
 
 export const logGas = async (
