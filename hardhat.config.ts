@@ -112,6 +112,12 @@ export default {
       ...sharedNetworkConfig,
       url: `https://api.avax.network/ext/bc/C/rpc`,
     },
+    "lisk-sepolia": {
+      ...sharedNetworkConfig,
+      chainId: 4202,
+      url: "https://rpc.sepolia-api.lisk.com",
+      gasPrice: 1000000000,
+    },
   },
   namedAccounts: {
     deployer: 0,
@@ -121,5 +127,15 @@ export default {
   },
   etherscan: {
     apiKey: ETHERSCAN_API_KEY,
+    customChains: [
+      {
+        network: "lisk-sepolia",
+        chainId: 4202,
+        urls: {
+          apiURL: "https://sepolia-blockscout.lisk.com/api",
+          browserURL: "https://sepolia-blockscout.lisk.com",
+        },
+      },
+    ],
   },
 };
